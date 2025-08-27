@@ -1,0 +1,549 @@
+ private bool CheckSaisie(bool toSave = false)
+ {
+     _EntryPoint MyApp = Application as _EntryPoint;
+     Interview interview = new Interview(MyApp.AdminConfig.ManagementSystem, Activity.DonneesGeneric.IdEntretien);
+     bool IsError = false;
+     DbtDate Date1 = null;
+     DbtDate Date2 = null;
+     OngletVM onglet = Data.GenericOnglet.Page.OngletsList.FirstOrDefault(e => e.Id == Data.CodeOngletActive);
+
+     foreach (var bloc in onglet.BlocsList)
+     {
+         if(onglet.PositionOnglet == 1)
+         {
+            
+             foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+             {
+                 if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                 || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                || interview.IsToRealise)
+                 {
+                     if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampGauche.Auteur == "C") || (Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampDroit.Auteur == "C") 
+                         || (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampGauche.Auteur == "M") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampDroit.Auteur == "M") 
+                         || (ligne.ChampGauche.Auteur == "B") || (ligne.ChampDroit.Auteur == "B"))
+                     {
+                         if (ligne.ChampGauche.ValeurInitTxt == "PDToday-1")
+                         {
+                             Date1 = ligne.ChampGauche.ValeurDate;
+                         }
+                         if (ligne.ChampDroit.ValeurInitTxt == "PFToday")
+                         {
+                             Date2 = ligne.ChampDroit.ValeurDate;
+                         }
+                         if (Date1 != null && Date2 != null && !DateHelper.CheckIfBeforeOrSame(Date1, Date2))
+                         {
+                             Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.WrongDates());
+                             IsError = true;
+                         }
+                         if (ligne.ChampDroit.Id == 550)
+                         {
+                             if (Data.TypeAffichage == InterviewDisplay.EntretienFinal && !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                             {
+                                 Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.MandatoryDate());
+                                 IsError = true;
+                             }
+                         }
+                         else
+                         {
+                             if(ligne.ChampGauche != null)
+                             {
+                                 if (ligne.ChampGauche.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGauche.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampGauche/ChampGauche/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGauche.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGauche.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampGauche/ChampGauche/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampGauche.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+                             if (ligne.ChampDroit != null)
+                             {
+                                 if (ligne.ChampDroit.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroit.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroit.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroit.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampDroit.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+
+                         }
+                     }
+
+                 }
+                 else
+                 {
+                     if (!toSave)
+                     {
+                         if (ligne.ChampGauche.Id != 550 || ligne.ChampDroit.Id != 550)
+                         {
+                             if (ligne.ChampGauche != null)
+                             {
+                                 if (ligne.ChampGauche.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGauche.ValeurDate))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGauche.Libelle)), MessageType.WARNING));
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGauche.valeur))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGauche.Libelle)), MessageType.WARNING));
+                                     }
+
+                                 }
+                             }
+                             if (ligne.ChampDroit != null)
+                             {
+                                 if (ligne.ChampDroit.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroit.ValeurDate))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroit.Libelle)), MessageType.WARNING));
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroit.valeur))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroit.Libelle)), MessageType.WARNING));
+                                     }
+
+                                 }
+                             }
+                            
+                         }
+                     }
+                 }
+
+             }
+         }
+         // Cas autres onglets
+         else
+         {
+             if (bloc.IdParent != 0)
+             {
+                 foreach (var ssbloc in bloc.SousBlocsList)
+                 {
+                     foreach (var champ in ssbloc.ChampsList.Where(c => c.Oblig == "O"))
+                     {
+                         if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                         || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                        || interview.IsToRealise)
+                         {
+                             if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M") || (champ.Auteur == "B"))
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(champ.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(champ.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+
+                             }
+
+                         }
+                         else
+                         {
+                             if (!toSave)
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(champ.ValeurDate))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(champ.valeur))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+                                     }
+
+                                 }
+                             }
+                         }
+
+                         if (champ.IdParent != 0)
+                         {
+                             foreach (var sschamp in champ.SousChamps)
+                             {
+                                 if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                                 || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                                || interview.IsToRealise)
+                                 {
+                                     if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && sschamp.Auteur == "C") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && sschamp.Auteur == "M") || (sschamp.Auteur == "B"))
+                                     {
+                                         if (champ.Type == "DA")
+                                         {
+                                             if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(sschamp.ValeurDate))
+                                             {
+                                                 Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)));
+                                                 IsError = true;
+                                             }
+                                         }
+                                         else
+                                         {
+                                             if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(sschamp.valeur))
+                                             {
+                                                 Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                                                 IsError = true;
+                                             }
+
+                                         }
+
+                                     }
+
+                                 }
+                                 else
+                                 {
+                                     if (!toSave)
+                                     {
+                                         if (sschamp.Type == "DA")
+                                         {
+                                             if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(sschamp.ValeurDate))
+                                             {
+                                                 Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)), MessageType.WARNING));
+                                             }
+                                         }
+                                         else
+                                         {
+                                             if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(sschamp.valeur))
+                                             {
+                                                 Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)), MessageType.WARNING));
+                                             }
+
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+
+                     }
+                 }
+             }
+             foreach (var champ in bloc.ChampsList.Where(c => c.Oblig == "O"))
+             {
+                 if (bloc.type == Constantes.Bloc_Tableau)
+                 {
+                     foreach (var ligne in champ.LignesChampsAVM.Where(c => c.ChampGaucheM.Oblig == "O" || c.ChampDroitM.Oblig == "O" || c.ChampDroitC.Oblig == "O" || c.ChampGaucheC.Oblig == "O"))
+                     {
+                         if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                     || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                     || interview.IsToRealise)
+                         {
+                             if (Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampDroitC.Auteur == "C")
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroitC.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitC/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitC.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroitC.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitC/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampDroitC.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+                             if (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampDroitM.Auteur == "M")
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroitM.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitM/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitM.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroitM.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitM/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampDroitM.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+                             if (Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampGaucheC.Auteur == "C") 
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGaucheC.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheC/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheC.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGaucheC.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheC/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampGaucheC.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+                             if (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampGaucheM.Auteur == "M")
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGaucheM.ValeurDate))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheM/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheM.Libelle)));
+                                         IsError = true;
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGaucheM.valeur))
+                                     {
+                                         Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheM/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampGaucheM.Libelle)));
+                                         IsError = true;
+                                     }
+
+                                 }
+                             }
+
+                         }
+                         else
+                         {
+                             if (!toSave)
+                             {
+                                 if (Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampDroitC.Auteur == "C")
+                                 {
+                                     if (champ.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroitC.ValeurDate))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitC.Libelle)), MessageType.WARNING));
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroitC.valeur))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitC.Libelle)), MessageType.WARNING));
+                                         }
+
+                                     }
+                                 }
+                                 if (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampDroitM.Auteur == "M")
+                                 {
+                                     if (champ.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampDroitM.ValeurDate))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitM.Libelle)), MessageType.WARNING));
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampDroitM.valeur))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitM.Libelle)), MessageType.WARNING));
+                                         }
+
+                                     }
+                                 }
+                                 if (Data.TypeAffichage == InterviewDisplay.Collaborateur && ligne.ChampGaucheC.Auteur == "C")
+                                 {
+                                     if (champ.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGaucheC.ValeurDate))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheC.Libelle)), MessageType.WARNING));
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGaucheC.valeur))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheC.Libelle)), MessageType.WARNING));
+                                         }
+
+                                     }
+                                 }
+                                 if (Data.TypeAffichage != InterviewDisplay.Collaborateur && ligne.ChampGaucheM.Auteur == "M")
+                                 {
+                                     if (champ.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(ligne.ChampGaucheM.ValeurDate))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheM.Libelle)), MessageType.WARNING));
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(ligne.ChampGaucheM.valeur))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheM.Libelle)), MessageType.WARNING));
+                                         }
+
+                                     }
+                                 }
+                                 
+                             }
+                         }
+                     }
+                 }
+                 else
+                 {
+                     if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                     || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                     || interview.IsToRealise)
+                     {
+                         if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M") || (champ.Auteur == "B"))
+                         {
+                             if (champ.Type == "DA")
+                             {
+                                 if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(champ.ValeurDate))
+                                 {
+                                     Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                                     IsError = true;
+                                 }
+                             }
+                             else
+                             {
+                                 if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(champ.valeur))
+                                 {
+                                     Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                                     IsError = true;
+                                  }
+
+                             }
+                         }
+
+                     }
+                     else
+                     {
+                         if (!toSave)
+                         {
+                             if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M") || (champ.Auteur == "B"))
+                             {
+                                 if (champ.Type == "DA")
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(champ.ValeurDate))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+                                     }
+                                 }
+                                 else
+                                 {
+                                     if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(champ.valeur))
+                                     {
+                                         Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+                                     }
+
+                                 }
+                             }
+
+                            
+                         }
+                     }
+                     if (champ.IdParent != 0)
+                     {
+                         foreach (var sschamp in champ.SousChamps)
+                         {
+                             if ((interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+                             || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+                            || interview.IsToRealise)
+                             {
+                                 if ((Data.TypeAffichage == InterviewDisplay.Collaborateur && sschamp.Auteur == "C") || (Data.TypeAffichage != InterviewDisplay.Collaborateur && sschamp.Auteur == "M") || (sschamp.Auteur == "B"))
+                                 {
+                                     if (champ.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(sschamp.ValeurDate))
+                                         {
+                                             Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)));
+                                             IsError = true;
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(sschamp.valeur))
+                                         {
+                                             Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                                             IsError = true;
+                                         }
+
+                                     }
+
+                                 }
+
+                             }
+                             else
+                             {
+                                 if (!toSave)
+                                 {
+                                     if (sschamp.Type == "DA")
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && !DateHelper.DateIsOk(sschamp.ValeurDate))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)), MessageType.WARNING));
+                                         }
+                                     }
+                                     else
+                                     {
+                                         if (Data.TypeAffichage != InterviewDisplay.Collaborateur && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(sschamp.valeur))
+                                         {
+                                             Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(sschamp.Libelle)), MessageType.WARNING));
+                                         }
+
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+              
+
+             }
+
+         }
+
+     }
+     
+     return IsError;
+ }
