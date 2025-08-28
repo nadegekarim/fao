@@ -1,0 +1,177 @@
+private bool CheckSaisie(bool toSave = false)
+{
+    _EntryPoint MyApp = Application as _EntryPoint;
+    Interview interview = new Interview(MyApp.AdminConfig.ManagementSystem, Activity.DonneesGeneric.IdEntretien);
+    bool isError = false;
+
+    OngletVM onglet = Data.GenericOnglet.Page.OngletsList.FirstOrDefault(e => e.Id == Data.CodeOngletActive);
+
+    foreach (var bloc in onglet.BlocsList)
+    {
+        if (onglet.PositionOnglet == 1)
+        {
+            foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+            {
+                if (DoValidate(interview))
+                {
+                    if (IsEditable(ligne.ChampGauche) || IsEditable(ligne.ChampDroit))
+                    {
+                        // Dates spécifiques Onglet 1
+                        if (ValidateDatesOnglet1(ligne.ChampGauche, ligne.ChampDroit))
+                            isError = true;
+
+                        // Validation générale
+                        isError |= ValidateChampGeneric(ligne.ChampGauche, toSave, interview);
+                        isError |= ValidateChampGeneric(ligne.ChampDroit, toSave, interview);
+
+                        // Validation date spécifique Id 550 pour entretien final
+                        if (ligne.ChampDroit.Id == 550 && Data.TypeAffichage == InterviewDisplay.EntretienFinal &&
+                            !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                        {
+                            Errors.AddErrorMessage(UserMessages.MandatoryDate());
+                            isError = true;
+                        }
+                    }
+                }
+                else if (!toSave)
+                {
+                    WarnChamp(ligne.ChampGauche);
+                    WarnChamp(ligne.ChampDroit);
+                }
+            }
+        }
+        else
+        {
+            // Validation pour autres onglets
+            ValidateBlocRecursive(bloc, interview, toSave, ref isError);
+        }
+    }
+
+    return isError;
+}
+
+// Méthode principale pour valider un champ et ses sous-champs
+private bool ValidateChampGeneric(ChampsVM champ, bool toSave, Interview interview)
+{
+    if (champ == null) return false;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return false;
+
+    bool isError = false;
+
+    if (DoValidate(interview) && IsEditable(champ))
+    {
+        if (champ.Type == "DA")
+        {
+            if (!DateHelper.DateIsOk(champ.ValeurDate))
+            {
+                Errors.AddErrorMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                isError = true;
+            }
+        }
+        else if (string.IsNullOrEmpty(champ.valeur))
+        {
+            Errors.AddErrorMessage(UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+            isError = true;
+        }
+
+        // Validation spéciale pour tableau
+        if (champ.LignesChampsAVM != null && champ.LignesChampsAVM.Any())
+        {
+            foreach (var ligne in champ.LignesChampsAVM)
+            {
+                isError |= ValidateChampAVM(ligne.ChampGaucheC, toSave, interview);
+                isError |= ValidateChampAVM(ligne.ChampDroitC, toSave, interview);
+                isError |= ValidateChampAVM(ligne.ChampGaucheM, toSave, interview);
+                isError |= ValidateChampAVM(ligne.ChampDroitM, toSave, interview);
+            }
+        }
+    }
+    else if (!toSave)
+    {
+        WarnChamp(champ);
+    }
+
+    // Validation récursive des sous-champs
+    if (champ.SousChamps != null && champ.SousChamps.Any())
+    {
+        foreach (var sschamp in champ.SousChamps)
+            isError |= ValidateChampGeneric(sschamp, toSave, interview);
+    }
+
+    return isError;
+}
+
+// Validation des champs du tableau
+private bool ValidateChampAVM(ChampsVM champ, bool toSave, Interview interview)
+{
+    if (champ == null) return false;
+
+    return ValidateChampGeneric(champ, toSave, interview);
+}
+
+// Validation d’un bloc et de ses sous-blocs
+private void ValidateBlocRecursive(BlocVM bloc, Interview interview, bool toSave, ref bool isError)
+{
+    foreach (var champ in bloc.ChampsList.Where(c => c.Oblig == "O"))
+        isError |= ValidateChampGeneric(champ, toSave, interview);
+
+    if (bloc.SousBlocsList != null)
+    {
+        foreach (var ssbloc in bloc.SousBlocsList)
+        {
+            foreach (var champ in ssbloc.ChampsList.Where(c => c.Oblig == "O"))
+                isError |= ValidateChampGeneric(champ, toSave, interview);
+        }
+    }
+}
+
+// Gestion des warnings pour champs non remplis
+private void WarnChamp(ChampsVM champ)
+{
+    if (champ == null) return;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+            Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+    else if (string.IsNullOrEmpty(champ.valeur))
+    {
+        Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+}
+
+// Validation spéciale pour les dates Onglet 1
+private bool ValidateDatesOnglet1(ChampsVM champGauche, ChampsVM champDroit)
+{
+    DbtDate date1 = champGauche.ValeurInitTxt == "PDToday-1" ? champGauche.ValeurDate : null;
+    DbtDate date2 = champDroit.ValeurInitTxt == "PFToday" ? champDroit.ValeurDate : null;
+
+    if (date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+    {
+        Errors.AddErrorMessage(UserMessages.WrongDates());
+        return true;
+    }
+
+    return false;
+}
+
+// Vérifie si on doit valider
+private bool DoValidate(Interview interview) =>
+    (interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+    || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+    || interview.IsToRealise;
+
+// Vérifie si un champ est éditable
+private bool IsEditable(ChampsVM champ)
+{
+    if (champ == null) return false;
+    return (Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C")
+        || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+        || champ.Auteur == "B";
+}
