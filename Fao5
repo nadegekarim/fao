@@ -1,0 +1,434 @@
+
+        private bool CheckSaisie(bool toSave = false)
+        {
+            _EntryPoint MyApp = Application as _EntryPoint;
+            Interview interview = new Interview(MyApp.AdminConfig.ManagementSystem, Activity.DonneesGeneric.IdEntretien);
+            bool IsError = false;
+            DbtDate date1 = null;
+            DbtDate date2 = null;
+
+            OngletVM onglet = Data.GenericOnglet.Page.OngletsList.FirstOrDefault(e => e.Id == Data.CodeOngletActive);
+
+            foreach (var bloc in onglet.BlocsList)
+            {
+                if (onglet.PositionOnglet == 1)
+                {
+                    foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+                    {
+                        if (DoValidate(interview))
+                        {
+                            if (IsEditable(ligne.ChampGauche) || IsEditable(ligne.ChampDroit))
+                            {
+                                // Dates spécifiques
+                                if (ligne.ChampGauche.ValeurInitTxt == "PDToday-1") date1 = ligne.ChampGauche.ValeurDate;
+                                if (ligne.ChampDroit.ValeurInitTxt == "PFToday") date2 = ligne.ChampDroit.ValeurDate;
+
+                                if (date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+                                {
+                                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.WrongDates());
+                                    IsError = true;
+                                }
+                                
+
+                                if (ligne.ChampDroit.Id == 550 && Data.TypeAffichage == InterviewDisplay.EntretienFinal &&
+                                    !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                                {
+                                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.MandatoryDate());
+                                    IsError = true;
+                                }
+                                else
+                                {
+                                    IsError |= ValidateLigneChamp(ligne.ChampGauche,false);
+                                    IsError |= ValidateLigneChamp(ligne.ChampDroit,true);
+                                }
+                            }
+                        }
+                        else if (!toSave)
+                        {
+                            if (ligne.ChampGauche.Id != 550 || ligne.ChampDroit.Id != 550)
+                            {
+                                WarnChamp(ligne.ChampGauche,false);
+                                WarnChamp(ligne.ChampDroit,true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Cas autres onglets
+                    ValidateBloc(bloc, interview, toSave, ref IsError);
+                }
+            }
+
+            return IsError;
+        }
+
+        /// <summary>
+        /// Détermine si on doit appliquer les validations obligatoires.
+        /// </summary>
+        private bool DoValidate(Interview interview) =>
+            (interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+            || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+            || interview.IsToRealise;
+
+        /// <summary>
+        /// Vérifie si un champ est éditable selon le type d’affichage et son auteur.
+        /// </summary>
+        private bool IsEditable(ChampsVM champ)
+        {
+            if (champ == null) return false;
+            return (Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C")
+                || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+                || champ.Auteur == "B";
+        }
+
+        /// <summary>
+        /// Vérifie et ajoute une erreur si le champ n’est pas valide.
+        /// </summary>
+        private bool ValidateLigneChamp(ChampsVM champ, bool isChampDroit = false)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+
+            // Cas d'un champ de type date
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                    if (isChampDroit)
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate",
+                            UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                    else
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampGauche/ChampGauche/ValeurDate",
+                            UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+
+                    return true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    if (isChampDroit)
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/valeur",
+                            UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                    else
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampGauche/ChampGauche/valeur",
+                            UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool ValidateChamp(ChampsVM champ)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+
+            // Cas d'un champ de type date
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                   Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool ValidateSousblocChamp(ChampsVM champ)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+
+            // Cas d'un champ de type date
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ValidateSousChamp(ChampsVM champ)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+
+            // Cas d'un champ de type date
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ValidateSousChampbysousbloc(ChampsVM champ)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+
+            // Cas d'un champ de type date
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/SousBlocsList/BlocVM/ChampsList/ChampsVM/SousChamps/ChampsVM/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Ajoute un warning si le champ n’est pas rempli (cas !toSave).
+        /// </summary>
+        private void WarnChamp(ChampsVM champ, bool isChampDroit = false)
+        {
+            if (champ == null) return;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult ||
+                Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return;
+
+            if (champ.Type == "DA")
+            {
+                if (!DateHelper.DateIsOk(champ.ValeurDate))
+                {
+                    Messages.Add(new UserMessage(
+                        UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)),
+                        MessageType.WARNING
+                    ));
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(champ.valeur))
+                {
+                    Messages.Add(new UserMessage(
+                        UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)),
+                        MessageType.WARNING
+                    ));
+                }
+            }
+        }
+        private bool ValidateChampTab(ChampsVM champ, bool isChampDroitC = false, bool isChampDroitM = false,bool isChampGaucheC = false, bool isChampGaucheM = false)
+        {
+            if (champ == null) return false;
+
+            if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+                return false;
+          
+            if (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+            {
+                if (champ.Type == "DA")
+                {
+                    if (!DateHelper.DateIsOk(champ.ValeurDate) && isChampDroitM)
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitM/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampDroitM.Libelle)));
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(champ.valeur) && isChampDroitM)
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampDroitM/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampDroitM.Libelle)));
+                        return true;
+                    }
+
+                }
+            }
+            if (Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C")
+            {
+                if (champ.Type == "DA")
+                {
+                    if (!DateHelper.DateIsOk(champ.ValeurDate) && isChampGaucheC)
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheC/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheC.Libelle)));
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(champ.valeur) && isChampGaucheC)
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheC/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampGaucheC.Libelle)));
+                        return true;
+                    }
+
+                }
+            }
+            if (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+            {
+                if (champ.Type == "DA")
+                {
+                    if (!DateHelper.DateIsOk(champ.ValeurDate) && isChampGaucheM)
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheM/ValeuDate", UserMessages.PleaseComplete(I18N.Translate(ligne.ChampGaucheM.Libelle)));
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (Data.TypeAffichage != InterviewDisplay.CollaboratorConsult && Data.TypeAffichage != InterviewDisplay.ResponsableConsult && string.IsNullOrEmpty(champ.valeur))
+                    {
+                        Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/ChampsList/ChampsVM/LignesChampsAVM/LigneChampVM/ChampGaucheM/valeur", UserMessages.PleaseType(I18N.Translate(ligne.ChampGaucheM.Libelle)));
+                        return true;
+                    }
+
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gère la validation d’un bloc et de ses sous-éléments (cas onglets > 1).
+        /// </summary>
+        private void ValidateBloc(BlocVM bloc, Interview interview, bool toSave, ref bool isError)
+        {
+            if (bloc.IdParent != 0)
+            {
+                foreach (var ssbloc in bloc.SousBlocsList)
+                {
+                    foreach (var champ in ssbloc.ChampsList.Where(c => c.Oblig == "O"))
+                    {
+                        ValidateblocChampOrSousChamp(champ, interview, toSave, ref isError);
+                    }
+                }
+            }
+
+            foreach (var champ in bloc.ChampsList.Where(c => c.Oblig == "O"))
+            {
+                if (bloc.type == Constantes.Bloc_Tableau)
+                {
+                    foreach (var ligne in champ.LignesChampsAVM.Where(c =>
+                        c.ChampGaucheM.Oblig == "O" || c.ChampDroitM.Oblig == "O" ||
+                        c.ChampDroitC.Oblig == "O" || c.ChampGaucheC.Oblig == "O"))
+                    {
+                        isError |= ValidateChampTab(ligne.ChampDroitC,true,false,false,false);
+                        isError |= ValidateChampTab(ligne.ChampDroitM,false,true,false,false);
+                        isError |= ValidateChampTab(ligne.ChampGaucheC,false,false,true,false);
+                        isError |= ValidateChampTab(ligne.ChampGaucheM,false,false,false,true);
+                    }
+                }
+                else
+                {
+                    ValidateChampOrSousChamp(champ, interview, toSave, ref isError);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Valide un champ et ses sous-champs si nécessaire.
+        /// </summary>
+        private void ValidateChampOrSousChamp(ChampsVM champ, Interview interview, bool toSave, ref bool isError)
+        {
+            if (DoValidate(interview))
+            {
+                if (IsEditable(champ))
+                    ValidateChamp(champ);
+            }
+            else if (!toSave)
+            {
+                WarnChamp(champ);
+            }
+
+            if (champ.IdParent != 0)
+            {
+                foreach (var sschamp in champ.SousChamps)
+                {
+                    if (DoValidate(interview))
+                    {
+                        if (IsEditable(sschamp))
+                            ValidateSousChamp(sschamp);
+                    }
+                    else if (!toSave)
+                    {
+                        WarnChamp(sschamp);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Valide un sous bloc , champ et ses sous-champs si nécessaire.
+        /// </summary>
+        private void ValidateblocChampOrSousChamp(ChampsVM champ, Interview interview, bool toSave, ref bool isError)
+        {
+            if (DoValidate(interview))
+            {
+                if (IsEditable(champ))
+                    ValidateSousblocChamp(champ);
+            }
+            else if (!toSave)
+            {
+                WarnChamp(champ);
+            }
+
+            if (champ.IdParent != 0)
+            {
+                foreach (var sschamp in champ.SousChamps)
+                {
+                    if (DoValidate(interview))
+                    {
+                        if (IsEditable(sschamp))
+                            ValidateSousChampbysousbloc(sschamp);
+                    }
+                    else if (!toSave)
+                    {
+                        WarnChamp(sschamp);
+                    }
+                }
+            }
+        }
