@@ -1,0 +1,70 @@
+private bool ValidateChamp(ChampVM champ, bool isChampDroit = false)
+{
+    if (champ == null) return false;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult ||
+        Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return false;
+
+    // Cas d'un champ de type date
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+        {
+            if (isChampDroit)
+                Errors.AddErrorMessage("...ChampDroit/ValeurDate",
+                    UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+            else
+                Errors.AddErrorMessage("...ChampGauche/ValeurDate",
+                    UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+
+            return true;
+        }
+    }
+    else
+    {
+        if (string.IsNullOrEmpty(champ.valeur))
+        {
+            if (isChampDroit)
+                Errors.AddErrorMessage("...ChampDroit/valeur",
+                    UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+            else
+                Errors.AddErrorMessage("...ChampGauche/valeur",
+                    UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+private void WarnChamp(ChampVM champ, bool isChampDroit = false)
+{
+    if (champ == null) return;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult ||
+        Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+        {
+            Messages.Add(new UserMessage(
+                UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)),
+                MessageType.WARNING
+            ));
+        }
+    }
+    else
+    {
+        if (string.IsNullOrEmpty(champ.valeur))
+        {
+            Messages.Add(new UserMessage(
+                UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)),
+                MessageType.WARNING
+            ));
+        }
+    }
+}
