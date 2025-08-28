@@ -1,0 +1,197 @@
+private bool CheckSaisie(bool toSave = false)
+{
+    _EntryPoint MyApp = Application as _EntryPoint;
+    Interview interview = new Interview(MyApp.AdminConfig.ManagementSystem, Activity.DonneesGeneric.IdEntretien);
+    bool isError = false;
+    DbtDate date1 = null;
+    DbtDate date2 = null;
+
+    OngletVM onglet = Data.GenericOnglet.Page.OngletsList.FirstOrDefault(e => e.Id == Data.CodeOngletActive);
+
+    foreach (var bloc in onglet.BlocsList)
+    {
+        if (onglet.PositionOnglet == 1)
+        {
+            foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+            {
+                if (DoValidate(interview))
+                {
+                    if (IsEditable(ligne.ChampGauche) || IsEditable(ligne.ChampDroit))
+                    {
+                        // Dates spécifiques
+                        if (ligne.ChampGauche.ValeurInitTxt == "PDToday-1") date1 = ligne.ChampGauche.ValeurDate;
+                        if (ligne.ChampDroit.ValeurInitTxt == "PFToday") date2 = ligne.ChampDroit.ValeurDate;
+
+                        if (date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+                            AddError("...ChampDroit/ValeurDate", UserMessages.WrongDates(), ref isError);
+
+                        if (ligne.ChampDroit.Id == 550 && Data.TypeAffichage == InterviewDisplay.EntretienFinal &&
+                            !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                        {
+                            AddError("...ChampDroit/ValeurDate", UserMessages.MandatoryDate(), ref isError);
+                        }
+                        else
+                        {
+                            ValidateChamp(ligne.ChampGauche, ref isError);
+                            ValidateChamp(ligne.ChampDroit, ref isError);
+                        }
+                    }
+                }
+                else if (!toSave)
+                {
+                    if (ligne.ChampGauche.Id != 550 || ligne.ChampDroit.Id != 550)
+                    {
+                        WarnChamp(ligne.ChampGauche);
+                        WarnChamp(ligne.ChampDroit);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Cas autres onglets
+            ValidateBloc(bloc, interview, toSave, ref isError);
+        }
+    }
+
+    return isError;
+}
+
+/// <summary>
+/// Détermine si on doit appliquer les validations obligatoires.
+/// </summary>
+private bool DoValidate(Interview interview) =>
+    (interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+    || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+    || interview.IsToRealise;
+
+/// <summary>
+/// Vérifie si un champ est éditable selon le type d’affichage et son auteur.
+/// </summary>
+private bool IsEditable(ChampVM champ)
+{
+    if (champ == null) return false;
+    return (Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C")
+        || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+        || champ.Auteur == "B";
+}
+
+/// <summary>
+/// Vérifie et ajoute une erreur si le champ n’est pas valide.
+/// </summary>
+private void ValidateChamp(ChampVM champ, ref bool isError)
+{
+    if (champ == null) return;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+            AddError($"{champ.Path}/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), ref isError);
+    }
+    else if (string.IsNullOrEmpty(champ.valeur))
+    {
+        AddError($"{champ.Path}/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)), ref isError);
+    }
+}
+
+/// <summary>
+/// Ajoute un warning si le champ n’est pas rempli (cas !toSave).
+/// </summary>
+private void WarnChamp(ChampVM champ)
+{
+    if (champ == null) return;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+            Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+    else if (string.IsNullOrEmpty(champ.valeur))
+    {
+        Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+}
+
+/// <summary>
+/// Gère la validation d’un bloc et de ses sous-éléments (cas onglets > 1).
+/// </summary>
+private void ValidateBloc(BlocVM bloc, Interview interview, bool toSave, ref bool isError)
+{
+    if (bloc.IdParent != 0)
+    {
+        foreach (var ssbloc in bloc.SousBlocsList)
+        {
+            foreach (var champ in ssbloc.ChampsList.Where(c => c.Oblig == "O"))
+            {
+                ValidateChampOrSousChamp(champ, interview, toSave, ref isError);
+            }
+        }
+    }
+
+    foreach (var champ in bloc.ChampsList.Where(c => c.Oblig == "O"))
+    {
+        if (bloc.type == Constantes.Bloc_Tableau)
+        {
+            foreach (var ligne in champ.LignesChampsAVM.Where(c =>
+                c.ChampGaucheM.Oblig == "O" || c.ChampDroitM.Oblig == "O" ||
+                c.ChampDroitC.Oblig == "O" || c.ChampGaucheC.Oblig == "O"))
+            {
+                ValidateChamp(ligne.ChampDroitC, ref isError);
+                ValidateChamp(ligne.ChampDroitM, ref isError);
+                ValidateChamp(ligne.ChampGaucheC, ref isError);
+                ValidateChamp(ligne.ChampGaucheM, ref isError);
+            }
+        }
+        else
+        {
+            ValidateChampOrSousChamp(champ, interview, toSave, ref isError);
+        }
+    }
+}
+
+/// <summary>
+/// Valide un champ et ses sous-champs si nécessaire.
+/// </summary>
+private void ValidateChampOrSousChamp(ChampVM champ, Interview interview, bool toSave, ref bool isError)
+{
+    if (DoValidate(interview))
+    {
+        if (IsEditable(champ))
+            ValidateChamp(champ, ref isError);
+    }
+    else if (!toSave)
+    {
+        WarnChamp(champ);
+    }
+
+    if (champ.IdParent != 0)
+    {
+        foreach (var sschamp in champ.SousChamps)
+        {
+            if (DoValidate(interview))
+            {
+                if (IsEditable(sschamp))
+                    ValidateChamp(sschamp, ref isError);
+            }
+            else if (!toSave)
+            {
+                WarnChamp(sschamp);
+            }
+        }
+    }
+}
+
+/// <summary>
+/// Ajoute une erreur.
+/// </summary>
+private void AddError(string path, string message, ref bool isError)
+{
+    Errors.AddErrorMessage(path, message);
+    isError = true;
+}
