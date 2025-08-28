@@ -1,0 +1,179 @@
+private bool CheckSaisie(bool toSave = false)
+{
+    _EntryPoint MyApp = Application as _EntryPoint;
+    Interview interview = new Interview(MyApp.AdminConfig.ManagementSystem, Activity.DonneesGeneric.IdEntretien);
+    bool isError = false;
+    DbtDate date1 = null;
+    DbtDate date2 = null;
+
+    OngletVM onglet = Data.GenericOnglet.Page.OngletsList.FirstOrDefault(e => e.Id == Data.CodeOngletActive);
+
+    foreach (var bloc in onglet.BlocsList)
+    {
+        if (onglet.PositionOnglet == 1)
+        {
+            foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+            {
+                if (DoValidate(interview))
+                {
+                    if (IsEditable(ligne.ChampGauche) || IsEditable(ligne.ChampDroit))
+                    {
+                        // Cas spécifiques pour les dates
+                        if (ligne.ChampGauche.ValeurInitTxt == "PDToday-1") date1 = ligne.ChampGauche.ValeurDate;
+                        if (ligne.ChampDroit.ValeurInitTxt == "PFToday") date2 = ligne.ChampDroit.ValeurDate;
+
+                        if (date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+                        {
+                            Errors.AddErrorMessage("...ChampDroit/ValeurDate", UserMessages.WrongDates());
+                            isError = true;
+                        }
+
+                        if (ligne.ChampDroit.Id == 550 && Data.TypeAffichage == InterviewDisplay.EntretienFinal &&
+                            !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                        {
+                            Errors.AddErrorMessage("...ChampDroit/ValeurDate", UserMessages.MandatoryDate());
+                            isError = true;
+                        }
+                        else
+                        {
+                            isError |= ValidateChamp(ligne.ChampGauche);
+                            isError |= ValidateChamp(ligne.ChampDroit);
+                        }
+                    }
+                }
+                else if (!toSave)
+                {
+                    if (ligne.ChampGauche.Id != 550 || ligne.ChampDroit.Id != 550)
+                    {
+                        WarnChamp(ligne.ChampGauche);
+                        WarnChamp(ligne.ChampDroit);
+                    }
+                }
+            }
+        }
+        else
+        {
+            ValidateBloc(bloc, interview, toSave, ref isError);
+        }
+    }
+
+    return isError;
+}
+
+//------------------- UTILITAIRES ---------------------
+
+private bool DoValidate(Interview interview) =>
+    (interview.IsPreparedCollaborator && Data.TypeAffichage == InterviewDisplay.Collaborateur)
+    || (interview.IsPreparedManager && Data.TypeAffichage == InterviewDisplay.Responsable)
+    || interview.IsToRealise;
+
+private bool IsEditable(ChampVM champ)
+{
+    if (champ == null) return false;
+    return (Data.TypeAffichage == InterviewDisplay.Collaborateur && champ.Auteur == "C")
+        || (Data.TypeAffichage != InterviewDisplay.Collaborateur && champ.Auteur == "M")
+        || champ.Auteur == "B";
+}
+
+private bool ValidateChamp(ChampVM champ)
+{
+    if (champ == null) return false;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return false;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+        {
+            Errors.AddErrorMessage($"{champ.Path}/ValeurDate", UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)));
+            return true;
+        }
+    }
+    else if (string.IsNullOrEmpty(champ.valeur))
+    {
+        Errors.AddErrorMessage($"{champ.Path}/valeur", UserMessages.PleaseType(I18N.Translate(champ.Libelle)));
+        return true;
+    }
+
+    return false;
+}
+
+private void WarnChamp(ChampVM champ)
+{
+    if (champ == null) return;
+
+    if (Data.TypeAffichage == InterviewDisplay.CollaboratorConsult || Data.TypeAffichage == InterviewDisplay.ResponsableConsult)
+        return;
+
+    if (champ.Type == "DA")
+    {
+        if (!DateHelper.DateIsOk(champ.ValeurDate))
+            Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+    else if (string.IsNullOrEmpty(champ.valeur))
+    {
+        Messages.Add(new UserMessage(UserMessages.PleaseComplete(I18N.Translate(champ.Libelle)), MessageType.WARNING));
+    }
+}
+
+private void ValidateBloc(BlocVM bloc, Interview interview, bool toSave, ref bool isError)
+{
+    if (bloc.IdParent != 0)
+    {
+        foreach (var ssbloc in bloc.SousBlocsList)
+        {
+            foreach (var champ in ssbloc.ChampsList.Where(c => c.Oblig == "O"))
+                ValidateChampOrSousChamp(champ, interview, toSave, ref isError);
+        }
+    }
+
+    foreach (var champ in bloc.ChampsList.Where(c => c.Oblig == "O"))
+    {
+        if (bloc.type == Constantes.Bloc_Tableau)
+        {
+            foreach (var ligne in champ.LignesChampsAVM.Where(c =>
+                c.ChampGaucheM.Oblig == "O" || c.ChampDroitM.Oblig == "O" ||
+                c.ChampDroitC.Oblig == "O" || c.ChampGaucheC.Oblig == "O"))
+            {
+                isError |= ValidateChamp(ligne.ChampDroitC);
+                isError |= ValidateChamp(ligne.ChampDroitM);
+                isError |= ValidateChamp(ligne.ChampGaucheC);
+                isError |= ValidateChamp(ligne.ChampGaucheM);
+            }
+        }
+        else
+        {
+            ValidateChampOrSousChamp(champ, interview, toSave, ref isError);
+        }
+    }
+}
+
+private void ValidateChampOrSousChamp(ChampVM champ, Interview interview, bool toSave, ref bool isError)
+{
+    if (DoValidate(interview))
+    {
+        if (IsEditable(champ))
+            isError |= ValidateChamp(champ);
+    }
+    else if (!toSave)
+    {
+        WarnChamp(champ);
+    }
+
+    if (champ.IdParent != 0)
+    {
+        foreach (var sschamp in champ.SousChamps)
+        {
+            if (DoValidate(interview))
+            {
+                if (IsEditable(sschamp))
+                    isError |= ValidateChamp(sschamp);
+            }
+            else if (!toSave)
+            {
+                WarnChamp(sschamp);
+            }
+        }
+    }
+}
