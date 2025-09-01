@@ -1,0 +1,11 @@
+ public static bool IsExistPers(MAE3I12_MAE3O12Output interviewData, int id)
+ {
+     if (interviewData.MAE3O12.TAB_FXD_TAB.Exists(x => x.IDT_DON == id))
+     {
+         return interviewData.MAE3O12.TAB_FXD_TAB.Find(x => x.IDT_DON == id).AFG == "O" ? "O" :"N":"P";
+     }
+     else
+     {
+         return true;
+     }
+ }
