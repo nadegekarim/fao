@@ -1,0 +1,53 @@
+public static void SavePersonnalisation(PersonnaliserEACViewModel personnalisation)
+{
+    List<DonneeToInsert> donneeToInserts = new List<DonneeToInsert>();
+    uint? idFormulaire = personnalisation.IdFormulaire;
+
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 409, personnalisation.HasComplement == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 408, personnalisation.IsAnciennete == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 83, personnalisation.IsCertifications == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 46, personnalisation.IsCompetencesCompl == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 49, personnalisation.IsActivitesCompl == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 55, personnalisation.IsTemoignagnagePair == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 61, personnalisation.IsActivite == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 69, personnalisation.HasRemuneration == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 73, personnalisation.IsNextEnt == "O", string.Empty));
+    donneeToInserts.Add(new DonneeToInsert(idFormulaire, 81, personnalisation.HasIntroduction == "O", (personnalisation.IntroductionHtml == null || string.IsNullOrWhiteSpace(personnalisation.IntroductionHtml.ToString())) ? string.Empty : HTMLHelper.RichTextToString(personnalisation.IntroductionHtml)));
+
+    foreach (DonneeToInsert donnee in donneeToInserts)
+    {
+       InsertionDonneesPerso(donnee);
+    }
+}
+
+public static Output InsertionDonneesPerso(DonneeToInsert donnee)
+{
+    var myService = Create();
+
+
+
+    myService.Input.IDT_FRL = donnee.IdFormulaire;
+    myService.Input.IDT_DON = donnee.IdDonnee;
+    myService.Input.AFG = donnee.Affichage.ToString() == "P" ? "P" : donnee.Affichage.ToString() == "O" ? "O" : "N";
+   //  myService.Input.AFG = donnee.Affichage ? "O": "N";
+    myService.Input.VAL = donnee.Valeur;
+
+    myService.Execute();
+
+    return myService.Output;
+}
+
+  public class DonneeToInsert
+  {
+      public uint? IdFormulaire { get; set; }
+      public uint? IdDonnee { get; set; }
+      public bool Affichage { get; set; }
+      public string Valeur { get; set; }
+      public DonneeToInsert(uint? idFormulaire, uint? idDonnee, bool affichage, string valeur)
+      {
+          IdFormulaire = idFormulaire;
+          IdDonnee = idDonnee;
+          Affichage = affichage;
+          Valeur = valeur;
+       }
+  }
