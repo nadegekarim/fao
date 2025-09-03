@@ -1,0 +1,45 @@
+foreach (var ligne in bloc.LignesChampsVM.Where(c => c.ChampGauche.Oblig == "O" || c.ChampDroit.Oblig == "O"))
+{
+    if (DoValidate(interview))
+    {
+        if (IsEditable(ligne.ChampGauche) || IsEditable(ligne.ChampDroit))
+        {
+            // Dates spécifiques
+            if (ligne.ChampGauche.ValeurInitTxt == "PDNow") date1 = ligne.ChampGauche.ValeurDate;
+            if (ligne.ChampDroit.ValeurInitTxt == "PFNow") date2 = ligne.ChampDroit.ValeurDate;
+
+            if (ligne.ChampDroit.Id == 550)
+            {
+                if(Data.TypeAffichage == InterviewDisplay.EntretienFinal 
+                   && !DateHelper.DateRealisationIsOk(ligne.ChampDroit.ValeurDate, interview.InsertionDate, interview.PlanifiedDate))
+                {
+                    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.MandatoryDate());
+                    IsError = true;
+                }
+            }
+            else
+            {
+                IsError |= ValidateLigneChamp(ligne.ChampGauche, false);
+                IsError |= ValidateLigneChamp(ligne.ChampDroit, true);
+            }
+        }
+    }
+    else if (!toSave)
+    {
+        if (ligne.ChampGauche.Id != 550 || ligne.ChampDroit.Id != 550)
+        {
+            if (ligne.ChampGauche != null)
+                WarnChamp(ligne.ChampGauche);
+
+            if (ligne.ChampDroit != null)
+                WarnChamp(ligne.ChampDroit);
+        }
+    }
+}
+
+// ⚡ Vérifier une seule fois les deux dates après la boucle
+if (date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+{
+    Errors.AddErrorMessage("Data/GenericOnglet/Page/OngletsList/OngletVM/BlocsList/BlocVM/LignesChampsVM/ChampDroit/ChampDroit/ValeurDate", UserMessages.WrongDates());
+    IsError = true;
+}
