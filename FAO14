@@ -1,0 +1,11 @@
+bool alreadyChecked = false;
+
+foreach (var ligne in bloc.LignesChampsVM)
+{
+    if (!alreadyChecked && date1 != null && date2 != null && !DateHelper.CheckIfBeforeOrSame(date1, date2))
+    {
+        Errors.AddErrorMessage("...", UserMessages.WrongDates());
+        IsError = true;
+        alreadyChecked = true; // ✅ n'affichera plus d'erreur
+    }
+}
