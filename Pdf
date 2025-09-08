@@ -1,0 +1,48 @@
+        public static void getPDF(string EntryFile, ITrace Tracer)
+        {
+
+            var pathPDF = EntryFile.Substring(0, EntryFile.LastIndexOf('\\'));
+            Encoding encode = Encoding.GetEncoding("utf-8");
+            List<string> csslist = new List<string>();
+
+            //Setting du path du fichier contenant le css selon le mode d'exectution
+#if DEBUG
+            string cssFile = "C:\\PRIV\\Projects\\AEN3\\AEN3_BATCHPDF\\AEN3_BatchPDF\\Utils\\StyleEEAA.css";
+#else
+            string cssFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Data\StyleEEAA.css");
+#endif
+
+            csslist.Add(File.ReadAllText(cssFile));
+
+            using (StreamReader reader = new StreamReader(EntryFile, encode))
+            {
+                string ligne = string.Empty;
+
+                while ((ligne = reader.ReadLine()) != null)
+                {
+                    string[] valeurs = ligne.Split(';');
+                    string nomPdf = valeurs[2] + "_" + valeurs[3] + "_" + valeurs[4];
+                    string htmlString = string.Empty;
+
+                    Tracer.Info("Création du PDF " + nomPdf);
+
+                    //Setting du nom du PDF et du dossier de destination
+                    PdfFileDestination dest = new PdfFileDestination(@pathPDF + "\\PDF\\" + nomPdf + ".pdf");
+
+                    switch (Convert.ToUInt32(valeurs[1]))
+                    {
+                        case 1:
+                            htmlString = EEAACommerciauxHTML.GetHTML(Convert.ToUInt32(valeurs[0]), valeurs[3]);
+                            break;
+
+                        case 2:
+                            htmlString = EEAASupportHTML.GetHTML(Convert.ToUInt32(valeurs[0]), valeurs[3]);
+                            break;
+                    }
+
+                    //Encoding en bytes pour etre converti en PDF
+                    MemoryStream inputMemoryStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
+                    PdfTools.ConvertHTMLToPDF(dest, inputMemoryStream, csslist.ToArray());
+                }
+            }
+        }
