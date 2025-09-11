@@ -1,0 +1,13 @@
+ [DefaultNextStep(target: typeof(GenericUpdatePDFGenerator))]
+ [Submission]
+ public NextStepId DoGeneratePDF(uint codepage, uint idFormulaire)
+ {
+     PageVM page = GenericInterviewPage.GenericOnglet.Page;
+     return NextStepId.Default(DonneesGeneric.IdEntretien, codepage, idFormulaire, interview.Label,DonneesGeneric.TypeAffichage, page);
+ }
+
+  public void Prepare(uint id, uint codepage, uint idFormulaire,string title, InterviewDisplay typeAffichage,string page)
+  {
+    
+     Document = CreateGenericPDF.getPDF(id, codepage, idFormulaire, title, typeAffichage);
+  }
