@@ -1,0 +1,566 @@
+internal class GenericPageHTML 
+{
+    public static string GetHTML(uint inEnt, string nomEnt, uint idFormulaire, PageVM page, Interview entretien, InterviewDisplay typeAffichage)
+    {
+        //List<ModeleDonVM> list = AppelMetier.FonctionLectureModeleGenerique(codepage);
+        //PageVM page = GenericPageExtension.FormattageDonnee(page, list, typeAffichage);
+
+        List<InterviewData> interviewData = AppelMetier.GetInterviewData(inEnt);
+        StringBuilder sb = new StringBuilder();
+        List<InterviewValidation> interviewValidations = AppelMetier.GetHistoriqueValidation(inEnt);
+        InterviewValidation validation1 = InterviewHelper.GetValidation(interviewValidations, Constantes.InterviewToValidate1StatusCode);
+        InterviewValidation validation2 = InterviewHelper.GetValidation(interviewValidations, Constantes.InterviewToValidate2StatusCode);
+        InterviewValidation validation3 = InterviewHelper.GetValidation(interviewValidations, Constantes.InterviewToValidate3StatusCode);
+        sb.Append("<!DOCTYPE html>");
+        sb.Append("<html lang=\"fr\" id=\"P:H\">");
+        sb.Append("<head>");
+        sb.Append("<title>AEN3_TALENT</title>");
+        sb.Append("<body id=\"P:Body\">");
+        sb.Append("<form id=\"P:F\" method=\"post\" novalidate=\"novalidate\" class=\"_devb_act ___Form\">");
+        sb.Append("<div id=\"M:D\">");
+        sb.Append("<div id=\"M:T:ttlBlockRoot\" class=\"ei_titleblock _c1 ei_mainblocfctl_title _c1\">");
+        sb.Append("<div id=\"M:T:contentBlock\" class=\"_c1 ei_titlecontent _c1\">");
+        sb.Append("<div id=\"M:T:labelBlock\" class=\"_c1 ei_titlelabelsblock _c1\">");
+        sb.Append("<div class=\"_c1 ei_titlelabel _c1\">");
+        sb.Append("<p id=\"M:T:title\" role=\"heading\" aria-level=\"2\" class=\"ei_titletext\">" + nomEnt + "</p>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("<div id =\"G:F1_0.G2:D\">");
+        sb.Append("</div>");
+        foreach (var onglet in page.OngletsList)
+        {
+            if (onglet.PositionOnglet == 1)
+            {
+                foreach (var bloc in onglet.BlocsList)
+                {
+                    // Cas onglet général
+                    switch (bloc.type)
+                    {
+                        case Constantes.Bloc_Infoper:
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+                            sb.Append("<div class=\"ei_groupingblock__header__content\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+                            sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+                            sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+                            sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+                            sb.Append("<span class =\"_c1 bigger _c1\">" + bloc.Titre + "</span>");
+                            sb.Append("</span>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+                            sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+                            sb.Append("<table width =\"100%\" role =\"presentation\" class=\"saisie ei_cellspacing\">");
+                            sb.Append("<colgroup role =\"presentation\">");
+                            sb.Append("<col style =\"width:25%;\"/>");
+                            sb.Append("<col style =\"width:75%;\"/>");
+                            sb.Append("</colgroup >");
+                            sb.Append("<tbody>");
+                            foreach (var champ in bloc.ChampsList)
+                            {
+                                if (champ.Type_Cpl != "NA")
+                                {
+                                    sb.Append("<tr>");
+                                    sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                    sb.Append("<p class=\"_c1 titlig _c1\">");
+                                    sb.Append("<label class=\"__e_Label\">" + champ.Libelle + "</label>");
+                                    sb.Append("</p>");
+                                    sb.Append("</td>");
+                                    switch (champ.Id)
+                                    {
+                                        case 401:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " " + StringHelper.EntitlePrenom(InterviewHelper.IsExist(interviewData, 402)) + "</td>");
+
+                                            break;
+                                        case 403:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " Depuis le " + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, 404)) + "</td>");
+
+                                            break;
+                                        case 405:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " Depuis le " + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, 406)) + "</td>");
+
+                                            break;
+                                        case 451:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " " + StringHelper.EntitlePrenom(InterviewHelper.IsExist(interviewData, 452)) + "</td>");
+
+                                            break;
+                                        case 453:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " Depuis le " + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, 454)) + "</td>");
+
+                                            break;
+                                        case 455:
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + " Depuis le " + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, 456)) + "</td>");
+
+                                            break;
+                                        default:
+                                            if (champ.Type == "DA")
+                                            {
+                                                sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.Id)) + "</td>");
+
+                                            }
+                                            else
+                                            {
+                                                sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + "</td>");
+
+                                            }
+                                            break;
+                                    }
+                                    sb.Append("</tr>");
+                                }
+
+                            }
+
+                            sb.Append("</tbody>");
+                            sb.Append("</table>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            break;
+
+                        case Constantes.Bloc_InfoGene:
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+                            sb.Append("<div class=\"ei_groupingblock__header__content\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+                            sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+                            sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+                            sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+                            sb.Append("<span class =\"_c1 bigger _c1\">" + bloc.Titre + "</span>");
+                            sb.Append("</span>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+                            sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+                            sb.Append("<table width =\"100%\" role =\"presentation\" class=\"saisie ei_cellspacing\">");
+                            sb.Append("<colgroup role =\"presentation\">");
+                            sb.Append("<col style =\"width:25%;\"/>");
+                            sb.Append("<col style =\"width:30%;\"/>");
+                            sb.Append("<col style =\"width:20%;\"/>");
+                            sb.Append("<col style =\"width:25%;\"/>");
+                            sb.Append("</colgroup >");
+                            sb.Append("<tbody>");
+                            if (page.TypeEntretien == "EeaaCommerciaux" || page.TypeEntretien == "EeaaSupport")
+                            {
+                                sb.Append("<tr>");
+                                sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                sb.Append("<p class=\"_c1 titlig _c1\">");
+                                sb.Append("<label class=\"__e_Label\">" + "Type" + "</label>");
+                                sb.Append("</p>");
+                                sb.Append("</td>");
+                                if (page.TypeEntretien == "EeaaCommerciaux")
+                                {
+                                    sb.Append("<td>" + Constantes.CONST_TYPE_EEAAC + "</td>");
+                                }
+                                else
+                                {
+                                    sb.Append("<td>" + Constantes.CONST_TYPE_EEAAS + "</td>");
+                                }
+                                sb.Append("<td>" + "" + "</td>");
+                                sb.Append("<td>" + "" + "</td>");
+                                sb.Append("</tr>");
+                            }
+                            foreach (var champ in bloc.LignesChampsVM)
+                            {
+                                sb.Append("<tr>");
+                                if (champ.ChampGauche.Type_Cpl != "IsDecline")
+                                {
+                                    sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                    sb.Append("<p class=\"_c1 titlig _c1\">");
+                                    sb.Append("<label class=\"__e_Label\">" + champ.ChampGauche.Libelle + "</label>");
+                                    sb.Append("</p>");
+                                    sb.Append("</td>");
+                                    if (champ.ChampGauche.Type == "DA")
+                                    {
+                                        sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.ChampGauche.Id)) + "</td>");
+                                    }
+                                    else
+                                    {
+                                        sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.ChampGauche.Id).Value + "</td>");
+                                    }
+                                }
+                                if (champ.ChampDroit.Type_Cpl != "IsDecline")
+                                {
+                                    sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                    sb.Append("<p class=\"_c1 titlig _c1\">");
+                                    sb.Append("<label class=\"__e_Label\">" + champ.ChampDroit.Libelle + "</label>");
+                                    sb.Append("</p>");
+                                    sb.Append("</td>");
+                                    if (champ.ChampDroit.Type == "DA")
+                                    {
+                                        sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.ChampDroit.Id)) + "</td>");
+                                    }
+                                    else
+                                    {
+                                        sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.ChampDroit.Id).Value + "</td>");
+                                    }
+                                }
+                                sb.Append("</tr>");
+                            }
+                            sb.Append("</tbody>");
+                            sb.Append("</table>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            break;
+
+                        case Constantes.Bloc_Delegate:
+                            if (PersonnalisationHelper.IsExist(interviewData, 551))
+                            {
+                                sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+                                sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+                                sb.Append("<div class=\"ei_groupingblock__header__content\">");
+                                sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+                                sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+                                sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+                                sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+                                sb.Append("<span class =\"_c1 bigger _c1\">" + bloc.Titre + "</span>");
+                                sb.Append("</span>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                                sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+                                sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+                                sb.Append("<table width =\"100%\" role =\"presentation\" class=\"saisie ei_cellspacing\">");
+                                sb.Append("<colgroup role =\"presentation\">");
+                                sb.Append("<col style =\"width:25%;\"/>");
+                                sb.Append("<col style =\"width:30%;\"/>");
+                                sb.Append("<col style =\"width:20%;\"/>");
+                                sb.Append("<col style =\"width:25%;\"/>");
+                                sb.Append("</colgroup >");
+                                sb.Append("<tbody>");
+                                foreach (var champ in bloc.LignesChampsVM)
+                                {
+                                    sb.Append("<tr>");
+                                    if (champ.ChampGauche.Type_Cpl == "IsDecline")
+                                    {
+                                        sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                        sb.Append("<p class=\"_c1 titlig _c1\">");
+                                        sb.Append("<label class=\"__e_Label\">" + champ.ChampGauche.Libelle + "</label>");
+                                        sb.Append("</p>");
+                                        sb.Append("</td>");
+                                        if (champ.ChampGauche.Type == "DA")
+                                        {
+                                            sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.ChampGauche.Id)) + "</td>");
+                                        }
+                                        else
+                                        {
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.ChampGauche.Id).Value + "</td>");
+                                        }
+                                    }
+                                    if (champ.ChampDroit.Type_Cpl == "IsDecline")
+                                    {
+                                        sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                        sb.Append("<p class=\"_c1 titlig _c1\">");
+                                        sb.Append("<label class=\"__e_Label\">" + champ.ChampDroit.Libelle + "</label>");
+                                        sb.Append("</p>");
+                                        sb.Append("</td>");
+                                        if (champ.ChampDroit.Type == "DA")
+                                        {
+                                            sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.ChampDroit.Id)) + "</td>");
+                                        }
+                                        else
+                                        {
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.ChampDroit.Id).Value + "</td>");
+                                        }
+                                    }
+                                    sb.Append("</tr>");
+                                }
+                                sb.Append("</tbody>");
+                                sb.Append("</table>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                                sb.Append("</div>");
+                            }
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                }
+            }
+            else
+            {
+                foreach (var bloc in onglet.BlocsList)
+                {
+                    if (bloc.type == Constantes.Bloc_Tableau)
+                    {
+                        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+                        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+                        sb.Append("<div class=\"ei_groupingblock__header__content\">");
+                        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+                        sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+                        sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+                        sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+                        sb.Append("<span class =\"_c1 bigger _c1\">" + bloc.Titre + "</span>");
+                        sb.Append("</span>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+                        sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+                        sb.Append("<table role =\"presentation\" width =\"100%\" class=\"over liste ei_cellspacing\">");
+                        sb.Append("<colgroup role =\"presentation\">");
+                        sb.Append("<col style =\"width:25%;\"/>");
+                        sb.Append("<col style =\"width:15%;\"/>");
+                        sb.Append("<col style =\"width:30%;\"/>");
+                        sb.Append("<col style =\"width:30%;\"/>");
+                        sb.Append("</colgroup >");
+                        sb.Append("<thead>");
+                        sb.Append("<th scope=\"col\">" + bloc.Libelle + "</th>");
+                        sb.Append("<th scope=\"col\">" + "Evaluation" + "</th>");
+                        sb.Append("<th scope=\"col\">" + "Commentaires du responsable" + "</th>");
+                        sb.Append("<th scope=\"col\">" + "Commentaires du collaborateur" + " </th>");
+                        sb.Append("</thead>");
+                        sb.Append("<tbody>");
+                        foreach (var champ in bloc.ChampsList)
+                        {
+                            sb.Append("<tr>");
+                            sb.Append("<th id=\"G:F1_1.G2:F_2.G13:F2_0.T3:T\" colspan=\"4\" scope=\"rowgroup\" class=\"rupture _c2 pointer _c2 \">" + champ.Libelle + "</th>");
+                            sb.Append("</tr>");
+                            int rowIndex = 0;
+                            foreach (var listchamp in champ.LignesChampsAVM)
+                            {
+                                string tdStyle = (rowIndex % 2 == 0) ? "i" : "p";
+                                sb.Append("<tr>");
+                                sb.Append("<td class='"+ tdStyle + "'>" + listchamp.ChampGaucheM.Libelle + "</td>");
+                                sb.Append("<td class='"+ tdStyle + "'>");
+                                sb.Append("<strong>" + GesparHelper.GetLib(interviewData.Find(x => x.IdDonnee == listchamp.ChampGaucheM.Id).Value) + "</strong>");
+                                sb.Append("</td>");
+                                sb.Append("<td class='" + tdStyle + "'>");
+                                sb.Append("<strong>" + interviewData.Find(x => x.IdDonnee == listchamp.ChampDroitM.Id).Value + "</strong>");
+                                sb.Append("</td>");
+                                sb.Append("<td class='" + tdStyle + "'>");
+                                sb.Append("<strong>" + interviewData.Find(x => x.IdDonnee == listchamp.ChampDroitC.Id).Value + "</strong>");
+                                sb.Append("</td>");
+                                sb.Append("</tr>");
+                                rowIndex++;
+                            }
+                        }
+                        sb.Append("</tbody>");
+                        sb.Append("</table>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                    }
+                    else
+                    {
+                        if (bloc.type != Constantes.Bloc_Cnil)
+                        {
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+                            sb.Append("<div class=\"ei_groupingblock__header__content\">");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+                            sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+                            sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+                            sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+                            sb.Append("<span class =\"_c1 bigger _c1\">" + bloc.Titre + "</span>");
+                            sb.Append("</span>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+                            sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+                            sb.Append("<table width =\"100%\" role =\"presentation\" class=\"saisie ei_cellspacing\">");
+                            sb.Append("<colgroup role =\"presentation\">");
+                            sb.Append("<col style =\"width:30%;\"/>");
+                            sb.Append("<col style =\"width:70%;\"/>");
+                            sb.Append("</colgroup >");
+                            sb.Append("<tbody>");
+                            foreach (var champ in bloc.ChampsList)
+                            {
+                                if (champ.Type_Cpl != "NS")
+                                {
+                                    sb.Append("<tr>");
+                                    sb.Append("<td class=\"_c1 ei - saisie__th _c1\">");
+                                    sb.Append("<p class=\"_c1 titlig _c1\">");
+                                    sb.Append("<label class=\"__e_Label\">" + champ.Libelle + "</label>");
+                                    sb.Append("</p>");
+                                    sb.Append("</td>");
+                                    if (champ.Type == "DA")
+                                    {
+                                        sb.Append("<td>" + DateHelper.GetSecuredDbtDateFromString(InterviewHelper.IsExist(interviewData, (int)champ.Id)) + "</td>");
+                                    }
+                                    else
+                                    {
+                                        if (champ.Type_Cpl == "EVAL")
+                                            sb.Append("<td>" + GesparHelper.GetLib(interviewData.Find(x => x.IdDonnee == champ.Id).Value) + "</td>");
+                                        else
+                                            sb.Append("<td>" + interviewData.Find(x => x.IdDonnee == champ.Id).Value + "</td>");
+                                    }
+                                    sb.Append("</tr>");
+                                }
+                            }
+                            sb.Append("</tbody>");
+                            sb.Append("</table>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                            sb.Append("</div>");
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if(validation1 != null)
+        {
+            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+            sb.Append("<div class=\"ei_groupingblock__header__content\">");
+            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+            sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+            sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+            sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+            sb.Append("<span class =\"_c1 bigger _c1\">" + "Validations" + "</span>");
+            sb.Append("</span>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+            sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+            sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+            sb.Append("<table role =\"presentation\" width =\"100%\" class=\"over liste ei_cellspacing\">");
+            sb.Append("<colgroup role =\"presentation\">");
+            sb.Append("<col style =\"width:30%;\"/>");
+            sb.Append("<col style =\"width:70%;\"/>");
+            sb.Append("</colgroup >");
+            sb.Append("<tbody>");
+            if (validation1 != null)
+            {
+                string action = validation1?.Action?.Code == Constantes.TYP_ACT_VLD || validation1?.Action?.Code == Constantes.TYP_ACT_TRM ? "J'accepte" : validation1?.Action?.Code == Constantes.TYP_ACT_VLDR ? "Je refuse" : string.Empty;
+                sb.Append("<tr>");
+                sb.Append("<th id=\"G:F1_1.G2:F_2.G13:F2_0.T3:T\" colspan=\"4\" scope=\"rowgroup\" class=\"rupture _c2 pointer _c2 \">" + "Validation 1 - " + validation1?.IndividuNom + " " + validation1?.IndividuPrenom + "-" + validation1?.ValidationDate.ToString("d") + "</th>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" + "Décision" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + action + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" +"Commentaire" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + validation1?.Commentaire + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+            }
+            if (validation2 != null)
+            {
+                string action = validation2?.Action?.Code == Constantes.TYP_ACT_VLD || validation2?.Action?.Code == Constantes.TYP_ACT_TRM ? "J'accepte" : validation2?.Action?.Code == Constantes.TYP_ACT_VLDR ? "Je refuse" : string.Empty;
+                sb.Append("<tr>");
+                sb.Append("<th id=\"G:F1_1.G2:F_2.G13:F2_0.T3:T\" colspan=\"4\" scope=\"rowgroup\" class=\"rupture _c2 pointer _c2 \">" + "Validation 2 - " + validation2?.IndividuNom + " " + validation2?.IndividuPrenom + "-" + validation2?.ValidationDate.ToString("d") + "</th>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" + "Décision" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + action + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" + "Commentaire" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + validation2?.Commentaire + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+            }
+            if (validation3 != null)
+            {
+                string action = validation3?.Action?.Code == Constantes.TYP_ACT_VLD || validation3?.Action?.Code == Constantes.TYP_ACT_TRM ? "J'accepte" : validation3?.Action?.Code == Constantes.TYP_ACT_VLDR ? "Je refuse" : string.Empty;
+                sb.Append("<tr>");
+                sb.Append("<th id=\"G:F1_1.G2:F_2.G13:F2_0.T3:T\" colspan=\"4\" scope=\"rowgroup\" class=\"rupture _c2 pointer _c2 \">" + "Validation 2 - " + validation3?.IndividuNom + " " + validation3?.IndividuPrenom + "-" + validation3?.ValidationDate.ToString("d") + "</th>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" + "Décision" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + action + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+                sb.Append("<tr>");
+                sb.Append("<td class=\"i\">" + "Commentaire" + "</td>");
+                sb.Append("<td class=\"i\">");
+                sb.Append("<strong>" + validation3?.Commentaire + "</strong>");
+                sb.Append("</td>");
+                sb.Append("</tr>");
+            }
+            sb.Append("</tbody>");
+            sb.Append("</table>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+        }
+
+        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:root\" class=\"ei_groupingblock ei_groupingblock-column\">");
+        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:header\" class=\"ei_groupingblock__header\">");
+        sb.Append("<div class=\"ei_groupingblock__header__content\">");
+        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:H:D\" class=\"ei_headerblock ei_groupingblock__header__maincontent\">");
+        sb.Append("<div id =\"G:F1_1.G2:F_1.G19:T:root\" class=\"ei_fbtitleblock-simple ei_fbtitleblock\">");
+        sb.Append("<div role =\"heading\" aria-level=\"1\" class=\"ei_fbtitleblock__header\">");
+        sb.Append("<span id =\"G:F2_0.G1:F_0.G3:title\">");
+        sb.Append("<span class =\"_c1 bigger _c1\">" + "Historique des actions" + " </span>");
+        sb.Append("</span>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("<div id =\"G:F2_0.G1:F_0.G3:root:content\" class=\"ei_groupingblock__content\">");
+        sb.Append("<div id =\"G: F2_0.G1:F_0.G2:D\">");
+        sb.Append("<table role =\"presentation\" width =\"100%\" class=\"over liste ei_cellspacing\">");
+        sb.Append("<colgroup role =\"presentation\">");
+        sb.Append("<col/>");
+        sb.Append("<col/>");
+        sb.Append("<col/>");
+        sb.Append("<col/>");
+        sb.Append("</colgroup >");
+        sb.Append("<thead>");
+        sb.Append("<th scope=\"col\">" + "Date de modification" + "</th>");
+        sb.Append("<th scope=\"col\">" + "Intervenant" + "</th>");
+        sb.Append("<th scope=\"col\">" + "Statut de l'entretien / motif" + "</th>");
+        sb.Append("<th scope=\"col\">" + "Action / Commentaire" + " </th>");
+        sb.Append("</thead>");
+        sb.Append("<tbody>");
+        int rowIndex2 = 0;
+        foreach (var champ in interviewValidations)
+        { 
+            string tdStyle = (rowIndex2 % 2 == 0) ? "i" : "p";
+                sb.Append("<tr>");
+                sb.Append("<td class='" + tdStyle + "'>" + champ?.ValidationDate.ToString() + "</td>");
+                sb.Append("<td class='" + tdStyle + "'>" + champ?.IndividuNom + " " + champ?.IndividuPrenom + "</td>");
+                sb.Append("<td class='" + tdStyle + "'>" + champ?.StatutLib + "</td>");
+                sb.Append("<td class='" + tdStyle + "'>" + champ?.Commentaire +"</td>");
+                sb.Append("</tr>");
+                rowIndex2++;
+        }
+        sb.Append("</tbody>");
+        sb.Append("</table>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+        sb.Append("</div>");
+
+
+        sb.Append("</div>");
+        sb.Append("</form>");
+        sb.Append("</body>");
+        sb.Append("</head>");
+        sb.Append("</html>");
+        return sb.ToString();
+    }
+
+
+}
