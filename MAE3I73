@@ -1,0 +1,75 @@
+      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**
+      *----------------------------------------------------------------*
+      * MAE3I73               partie ALLER Variable des MESSAGES    C14*
+      * -------               échangés avec tout SERVICE APPLICATIF C14*
+      *                                        Version  : 000          *
+      *                                        Longueur : 00500 octets *
+      *----------------------------------------------------------------*
+       01  :MAE3I73:.
+      *----------------------------------------------------------------*
+      * En-tête généralisé pour tout COPY de type MESSAGE           C14*
+      * Comportant TAGs (ou BALISEs) standards/normalisés apposées via *
+      * commentaires standards à respecter                             *
+      * TAGs standards/normalisés C14 d'en-tête de COPY MESSAGE        *
+      *  - [MsgIdt] : identifiant du message (=nom COPY associé)       *
+      *  - [MsgVrs] : version en cours de la description de cette      *
+      *                  partie du message                             *
+      *  - [MsgLen] : Longueur effective de cette description          *
+      *----------------------------------------------------------------*
+           05  .
+      *[Dsc] Identifiant de cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgIdt]
+             10                          PIC X(008) VALUE 'MAE3I73'.
+      *[Dsc] Version courante de cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgVrs]
+             10                          PIC X(003) VALUE '000'.
+      *[Dsc] Longueur effective de cette description
+      *[Cst]
+      *[Typ] Integer
+      *[MsgLen]
+             10                          PIC 9(005) VALUE 2000.
+      
+      *----------------------------------------------------------------*
+      * Business Data
+      *----------------------------------------------------------------*
+      *[Dsc] Donnée allée pour le service RHU-OngInsGen
+           05  :MAE3I73:-Data.
+      
+      *[Dsc] Identifiant onglet
+      *[Typ] Integer
+             10 :MAE3I73:-IDT                PIC 9(05).
+      
+      *[Dsc] TITRE
+      *[Typ] String
+             10 :MAE3I73:-TIT                PIC X(200).
+      
+      *[Dsc] Position onglet
+      *[Typ] Integer
+             10 :MAE3I73:-POS                PIC 9(09).
+      
+      *[Dsc] Recapitulatif Onglet
+      *[Typ] String
+             10 :MAE3I73:-RCP                PIC X(1).
+      
+      *[Dsc] Identifiant Modèle
+      *[Typ] Integer
+             10 :MAE3I73:-IDT-MDE            PIC 9(05).
+      
+      
+      
+           05  FILLER                        PIC X(1786).
+      
+      *----------------------------------------------------------------*
+      * Eye-Catcher - balise de fin de la description, permettant de   *
+      *               vérifier à minima la cohérence du contenu porté. *
+      *               Si balise de fin présente et non altérée...      *
+      *----------------------------------------------------------------*
+      *[Dsc] Eye-Catcher lié à cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgIdtEnd]
+           05                            PIC X(008) VALUE '/MAE3I73'.
