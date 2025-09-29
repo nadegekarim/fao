@@ -1,0 +1,625 @@
+      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+      *-Maintenance frame - Created on 07 May 2025 at 09:33:45
+      *-============================================================
+      *-Descent : 07/05/2025 at 09:33:45          MemoId  : DOUKOUNA
+      *-Reason  : ECHANG-GENERIQUE-INTERVIEW
+      *-More    :
+      *-============================================================
+      *-End of frame
+      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. AE3PONG.
+      
+      *================================================================*
+      * SKEL : SQEAPDB2 V1.1
+      *
+      * TYPE DE COMPOSANT D'ARCHITECTURE :  ACCESSOR
+      * CATEGORIE                        :  .......(.)
+      * ID PROGRAM                       :  AE3PONG
+      * DESIGNATION                      :  PHYSICAL ACCESSOR
+      *
+      * RESPONSABLE                      :  DOUKOUNA
+      * VERSION.RELEASE                  :  1.0.
+      * LANGAGE - GENERATOR              :  COBOL 3
+      *
+      * ============================================================== *
+      *  Description du trt : Accesseur physique à la table DB2
+      *                       TAE3ONG
+      *
+      * ============================================================== *
+      *  COPY UTILISES :
+      *
+      *  - YAE3FAL  : Partie aller fixe de la requête
+      *  - YAE3FRE  : Partie retour fixe de la requête
+      *  - YAE3MON  : Partie aller/retour variable de la requête
+      *  - TAE3ONG  : Desc. d'une occurrence de la table TAE3ONG
+      *  - YDB2DSP  : Gestion du code erreur DB2
+      *
+      * ============================================================== *
+      *  Fonctions disponibles
+      *
+      *    L0001     : Sélection ....................................
+      *    L0101     : Lecture liste ................................
+      *    M0001     : Modification .................................
+      *    S0001     : Suppression ..................................
+      *    I0001     : Insertion ....................................
+      *
+      ******************************************************************
+      
+      *REMARKS.
+      *         COPY=(
+      *               YDB2DSP
+      *               YDB2RET
+      *              ).
+      
+      *=================================================================
+       ENVIRONMENT DIVISION.
+      *=================================================================
+      
+      *-=-=-=-=-=-=-=-=-=-=-=-=
+       CONFIGURATION SECTION.
+      *-=-=-=-=-=-=-=-=-=-=-=-=
+      *SOURCE-COMPUTER. IBM-370.
+       SOURCE-COMPUTER. IBM-370 WITH DEBUGGING MODE.
+       SPECIAL-NAMES. DECIMAL-POINT IS COMMA.
+      
+      *=================================================================
+       DATA DIVISION.
+      *=================================================================
+      
+      *-=-=-=-=-=-=-=-=-=-=-=-=-=
+       WORKING-STORAGE SECTION.
+      *-=-=-=-=-=-=-=-=-=-=-=-=-=
+      
+       01  FILLER PIC X(30) VALUE '*** DEBUT WORKING AE3PONG ***'.
+      
+      *-----------------------------------------------------------------
+      *    Liste des modules appelés par le programme
+      *-----------------------------------------------------------------
+       01  C-PgmTab.
+           05  C-PgmNme                PIC X(08) VALUE 'AE3PONG '.
+           05  C-ZDB2DSP               PIC X(08) VALUE 'ZDB2DSP '.
+      
+      *-----------------------------------------------------------------
+      *    Paramètres pour appel des modules
+      *-----------------------------------------------------------------
+      
+      *-- Paramètres pour ZDB2DSP
+       01  DB2DSP.  COPY YDB2DSP .
+      
+      *-----------------------------------------------------------------
+      *    Déclarations pour gestion des erreurs :
+      *-----------------------------------------------------------------
+      
+      *-- Liste des erreurs gérées par le programme
+       01  W-Err                     PIC X(08).
+           88 W-Prc-OK                     VALUE '00000000'.
+      *-- Type d'action invalide
+           88 W-Err-InvalidActionType      VALUE '00038001'.
+      *-- Numero de fonction invalide
+           88 W-Err-InvalidFunction        VALUE '00038002'.
+      *-- Date ou heure invalide
+           88 W-Err-InvalidDateTime        VALUE '00058003'.
+      *-- Données non trouvées
+           88 W-Err-NotFound               VALUE '00068004'.
+      *-- Clé dupliquée
+           88 W-Err-DuplicateKey           VALUE '00078005'.
+      *-- Clé parente inconnue (intégrité référentielle)
+           88 W-Err-UnknownParentKey       VALUE '00058006'.
+      *-- Pas de modif de clé parente si clé dépendante (Intégrité réf)
+           88 W-Err-NoUpdateOfParentKey    VALUE '00058007'.
+      *-- Rubrique incompatible avec la structure de la colonne
+           88 W-Err-IncompatibelFormat     VALUE '00058008'.
+      *-- Erreur technique accès DB2
+           88 W-Err-DB2                    VALUE '99999999'.
+      
+       01  FILLER REDEFINES W-Err.
+           05 W-ErrCod.
+              10 W-PrmErrCod         PIC 9(04).
+                 88 W-Err-Sou-Pgm    value 0008.
+              10 W-ScdErrCod         PIC 9(04).
+      
+      *-- Booléens pour SQLCODE
+       01  DB2RET.  COPY YDB2RET .
+      
+      *-----------------------------------------------------------------
+      *   Déclaration des indicateurs
+      *-----------------------------------------------------------------
+      
+      
+      *-----------------------------------------------------------------
+      *   Déclaration des variables de travail
+      *-----------------------------------------------------------------
+      
+      *-- Odre SQL exécuté
+       01  W-SQLStmt                    PIC X(08).
+           88 W-SQLStmt-SELECT          VALUE 'SELECT'.
+           88 W-SQLStmt-OPEN            VALUE 'OPEN'.
+           88 W-SQLStmt-FETCH           VALUE 'FETCH'.
+           88 W-SQLStmt-CLOSE           VALUE 'CLOSE'.
+           88 W-SQLStmt-INSERT          VALUE 'INSERT'.
+           88 W-SQLStmt-UPDATE          VALUE 'UPDATE'.
+           88 W-SQLStmt-DELETE          VALUE 'DELETE'.
+      
+      *-- Label du paragraphe traité
+       01  W-Lbl                       PIC X(30).
+      *-- Variable de conversion du code retour DB2
+       01  W-SQLCod                    PIC ZZ9+  BLANK WHEN ZERO.
+      
+      *-- Variables DB2
+           EXEC SQL
+               INCLUDE SQLCA
+           END-EXEC.
+      
+      
+      *-----------------------------------------------------------------
+      *    Déclaration de la table TAE3ONG (DECLARE TABLE)
+      *-----------------------------------------------------------------
+           EXEC SQL DECLARE TAE3ONG TABLE
+           (
+             AE3ONG_IDT                     DECIMAL(5) NOT NULL,
+             AE3ONG_TIT                     CHAR(200) NOT NULL,
+             AE3ONG_POS                     INTEGER NOT NULL,
+             AE3ONG_RCP                     CHAR(1) NOT NULL,
+             AE3ONG_IDT_MDE                  DECIMAL(5) NOT NULL
+           )
+           END-EXEC.
+      
+      *-----------------------------------------------------------------
+      *    Déclaration des host-variables
+      *-----------------------------------------------------------------
+       01  AE3ONG.
+           COPY TAE3ONG  REPLACING ==:AE3ONG:== BY ==AE3ONG==.
+      *-----------------------------------------------------------------
+      *    Déclaration des arguments de recherche
+      *-----------------------------------------------------------------
+       01  AE3MON.
+           COPY YAE3MON  REPLACING ==:AE3MON: == BY ==AE3MON==.
+      
+       01  FILLER PIC X(30) VALUE '*** FIN WORKING AE3PONG ***'.
+      
+      
+      *-=-=-=-=-=-=-=-=-=
+       LINKAGE SECTION.
+      *-=-=-=-=-=-=-=-=-=
+      
+      *--  Partie aller fixe de la requête
+           COPY YAE3FAL REPLACING ==:AE3FAL:== BY ==AE3FAL==.
+      *--  Partie retour fixe de la requête
+           COPY YAE3FRE REPLACING ==:AE3FRE:== BY ==AE3FRE==.
+      
+      *--  Description des arguments pour accès à la table
+       01  AE3MONS.
+           COPY YAE3MON REPLACING ==:AE3MON:== BY ==AE3MONS==.
+      
+      *--  Description de la table TAE3ONG
+       01  AE3ONGS.
+           COPY TAE3ONG REPLACING ==:AE3ONG:== BY ==AE3ONGS==.
+      
+      
+      *=================================================================
+       PROCEDURE DIVISION USING YAE3FAL
+                                YAE3FRE
+                                AE3MONS
+                                AE3ONGS.
+      *=================================================================
+      
+      DDECLARATIVES.
+      DREADY-TRACE SECTION.
+      D    USE FOR DEBUGGING ON ALL PROCEDURES.
+      D    DISPLAY '***AE3PONG*** : ' DEBUG-ITEM '.'.
+      DEND DECLARATIVES.
+      
+      
+      *=================================================================
+      *    Traitement général
+      *=================================================================
+      *     1) Initialisation
+      *     2) Traitement de la fonction
+      *     3) Fin de programme
+      *=================================================================
+           PERFORM INITIALIZATIONS
+      
+           IF W-Prc-OK
+               PERFORM FUNCTION-PROCESSING
+           END-IF
+      
+           PERFORM EXIT-PROCESSING
+      
+           GOBACK.
+      
+      *-----------------------------------------------------------------
+       INITIALIZATIONS.
+      *-----------------------------------------------------------------
+      
+      *-- Initialisation du code retour DB2
+           MOVE ZEROS                    TO SQLCODE
+      
+      *-- Initialisation de la partie retour fixe
+           MOVE SPACES                   TO AE3FRE-OUTPUT
+      
+      *-- Transfert des arguments de la Linkage vers la Working
+           MOVE AE3MONS                  TO AE3MON
+      
+      *-- Initialisation pour les fonctions de lecture TAE3ONG
+           IF AE3FAL-FctTyp-Rea
+           OR AE3FAL-FctTyp-Chk
+               MOVE SPACES               TO AE3ONG
+           ELSE
+               MOVE AE3ONGS              TO AE3ONG
+           END-IF
+      
+      *-- Initialisation des codes retour
+           SET W-Prc-OK                  TO TRUE
+           MOVE ZERO                     TO AE3FRE-PrmRtnCod
+           MOVE ZERO                     TO AE3FRE-ScdRtnCod
+      
+      *-- Initialisation du nombre d'accès db2
+           MOVE  ZERO                    TO AE3FRE-ExeCnd-PhyAccsMea
+      
+      *-- Initialisation du type d'ordre SQL traité
+           EVALUATE TRUE
+               WHEN AE3FAL-ActTyp-Unq
+                    SET W-SQLStmt-SELECT  TO TRUE
+               WHEN AE3FAL-ActTyp-Inl
+                    SET W-SQLStmt-OPEN    TO TRUE
+               WHEN AE3FAL-ActTyp-NextRead
+                    SET W-SQLStmt-FETCH   TO TRUE
+               WHEN AE3FAL-ActTyp-PrevRead
+                    SET W-SQLStmt-FETCH   TO TRUE
+               WHEN AE3FAL-ActTyp-EndRead
+                    SET W-SQLStmt-CLOSE   TO TRUE
+               WHEN AE3FAL-ActTyp-Ise
+                    SET W-SQLStmt-INSERT  TO TRUE
+               WHEN AE3FAL-ActTyp-Upd
+                    SET W-SQLStmt-UPDATE  TO TRUE
+               WHEN AE3FAL-ActTyp-Dlt
+                    SET W-SQLStmt-DELETE  TO TRUE
+               WHEN OTHER
+                    SET W-Err-InvalidActionType  TO TRUE
+           END-EVALUATE
+           .
+      
+      *----------------------------------------------------------------*
+       FUNCTION-PROCESSING.
+      *----------------------------------------------------------------*
+      
+      *-- Débranchement vers la fonction demandée
+           EVALUATE AE3FAL-ReqFct-FctCod
+             WHEN 'L0001'
+                  PERFORM L0001-FUNCT-PROCESSING
+             WHEN 'L0101'
+                  PERFORM L0101-FUNCT-PROCESSING
+             WHEN 'I0001'
+                  PERFORM I0001-FUNCT-PROCESSING
+             WHEN 'M0001'
+                  PERFORM M0001-FUNCT-PROCESSING
+             WHEN 'S0001'
+                  PERFORM S0001-FUNCT-PROCESSING
+      
+             WHEN OTHER
+                  SET W-Err-InvalidFunction         TO TRUE
+           END-EVALUATE
+           .
+      
+      *-----------------------------------------------------------------
+       EXIT-PROCESSING.
+      *-----------------------------------------------------------------
+      
+      *-- Interprétation du code retour SQL pour alimentation des codes
+      *   retour du message technique
+           IF SQLCODE NOT = ZERO
+               Perform SQL-ERROR-PROCESSING
+           END-IF
+      
+           IF (W-Prc-OK)
+      *    -- Transfert des host-variables dans la zone d'échange
+               MOVE AE3ONG            TO AE3ONGS
+               MOVE AE3MON            TO AE3MONS
+      *    -- Comptabilisation des accès DB2 si traitement OK
+      *       (1 accès quelque soit l'ordre DB2 exécuté)
+               MOVE 1                 TO AE3FRE-ExeCnd-PhyAccsMea
+           ELSE
+      *    -- Positionne code retour dans message métier
+               MOVE W-PrmErrCod       TO AE3FRE-BizErrMsg-PrmRtnCod
+               MOVE W-ScdErrCod       TO AE3FRE-BizErrMsg-ScdRtnCod
+               MOVE C-PgmNme          TO AE3FRE-BizErrMsg-Pgm
+           END-IF
+           .
+      
+      
+      *=================================================================
+      *    Traitement des fonction de type "LECTURE UNIQUE"
+      *
+      *    !! Veiller à ne sélectionner que les colonnes nécessaires  !!
+      *    !! (La requête générée sélectionne l'ensemble des colonnes !!
+      *    !!  déclarées pour la table. Dans un soucis de performance,!!
+      *    !!  il convient de ne retenir que les colonnes dont on a   !!
+      *    !!  réellement besoin).                                    !!
+      *
+      *    !! ------------------------------------------------------- !!
+      *    !! OPTIONS DE LECTURE :                                    !!
+      *    !! ------------------------------------------------------- !!
+      *    !!                                                         !!
+      *    !! - WITH UR :                                             !!
+      *    !!   AVEC : Pas de verrouillage de la page (ligne), mais   !!
+      *    !!          pas de garantie d'intégrité des données lues   !!
+      *    !!   SANS : Garantie d'intégrité des données lues, mais    !!
+      *    !!          verrouillage de la page (ligne)                !!
+      *    !!                                                         !!
+      *    !!  Voir doc PIXIS "Réalisation d'accesseurs" (0990006820) !!
+      *    !!                                                         !!
+      *    !! ------------------------------------------------------- !!
+      *
+      *=================================================================
+      
+      *-----------------------------------------------------------------
+      *    L0001 : Sélection ...........................................
+      *-----------------------------------------------------------------
+       L0001-FUNCT-PROCESSING.
+      *-----------------------
+           MOVE 'L0001-SQL-STATEMENT'          TO W-Lbl
+      
+           EXEC SQL
+             SELECT
+               AE3ONG_TIT,
+               AE3ONG_POS,
+               AE3ONG_RCP
+             INTO
+               :AE3ONG-TIT,
+               :AE3ONG-POS,
+               :AE3ONG-RCP
+             FROM TAE3ONG
+             WHERE AE3ONG_IDT          = :AE3MON-IDT
+             AND AE3ONG_IDT_MDE        = :AE3MON-IDT-MDE
+            WITH UR
+           END-EXEC
+           .
+      
+      *=================================================================
+      *    Traitement des fonctions de type "LECTURE DE LISTE"
+      *
+      *    !! Veiller à ne sélectionner que les colonnes nécessaires  !!
+      *    !! (La requête générée sélectionne l'ensemble des colonnes !!
+      *    !!  déclarées pour la table. Dans un soucis de performance,!!
+      *    !!  il convient de ne retenir que les colonnes dont on a   !!
+      *    !!  réellement besoin).                                    !!
+      *
+      *    !! ------------------------------------------------------- !!
+      *    !! OPTIONS DE LECTURE :                                    !!
+      *    !! ------------------------------------------------------- !!
+      *    !!                                                         !!
+      *    !! - WITH HOLD :                                           !!
+      *    !!   Obligatoire en batch pour maintenir la position du    !!
+      *    !!   du curseur après un COMMIT effectué via ZPDSDB2       !!
+      *    !!                                                         !!
+      *    !! - WITH UR :                                             !!
+      *    !!   AVEC : Pas de verrouillage des pages (lignes)         !!
+      *    !!          sélectionnées, mais pas de garantie d'intégrité!!
+      *    !!          des données lues                               !!
+      *    !!   SANS : Garantie d'intégrité des données lues, mais    !!
+      *    !!          verrouillage des pages (lignes) sélectionnées  !!
+      *    !!                                                         !!
+      *    !! - FOR FETCH ONLY :                                      !!
+      *    !!   AVEC : Lecture sans intention de mise à jour, évite   !!
+      *    !!          le verrouillage des pages (ligne) sélectionnés !!
+      *    !!   SANS : Ambiguîté sur l'intention. Par défaut, les     !!
+      *    !!          pages (lignes) selectionnées sont verrouillées !!
+      *    !!          et ne peuvent être lues avec intention de mise !!
+      *    !!          à jour                                         !!
+      *    !!                                                         !!
+      *    !!  Voir doc PIXIS "Réalisation d'accesseurs" (0990006820) !!
+      *    !!                                                         !!
+      *    !! ------------------------------------------------------- !!
+      *
+      *=================================================================
+      *#TrtLecLst#*
+      
+      *-----------------------------------------------------------------
+      *    L0101 : Sélection ...........................................
+      *-----------------------------------------------------------------
+           EXEC SQL
+      ***    DECLARE C01   CURSOR WITH HOLD FOR
+             DECLARE C01   CURSOR FOR
+             SELECT
+               AE3ONG_IDT           , AE3ONG_TIT           ,
+               AE3ONG_POS           , AE3ONG_RCP           ,
+               AE3ONG_IDT_MDE
+             FROM TAE3ONG
+      ***    FOR FETCH ONLY
+      ***    WITH UR
+           END-EXEC
+           .
+      
+       L0101-FUNCT-PROCESSING.
+      *-----------------------
+      *-- Débranchement vers action demandée
+           EVALUATE TRUE
+             WHEN AE3FAL-ActTyp-Inl
+                  PERFORM L0101-INIT-PROCESSING
+             WHEN AE3FAL-ActTyp-NextRead
+                  PERFORM L0101-NEXT-PROCESSING
+             WHEN AE3FAL-ActTyp-EndRead
+                  PERFORM L0101-END-PROCESSING
+             WHEN OTHER
+                  SET W-Err-InvalidActionType  TO TRUE
+           END-EVALUATE
+           .
+      
+       L0101-INIT-PROCESSING.
+      *----------------------
+           MOVE 'L0101-INIT-PROCESSING'      TO W-Lbl
+      
+           EXEC SQL OPEN  C01   END-EXEC
+           IF SQLCODE = ZERO
+               PERFORM L0101-NEXT-PROCESSING
+           END-IF
+           .
+      
+       L0101-END-PROCESSING.
+      *---------------------
+           MOVE 'L0101-END-PROCESSING'      TO W-Lbl
+      
+           EXEC SQL CLOSE C01   END-EXEC
+           .
+      
+       L0101-NEXT-PROCESSING.
+      *------------------------
+           MOVE 'L0101-FETCH-STATEMENT'      TO W-Lbl
+      
+           EXEC SQL
+             FETCH C01
+            INTO
+               :AE3ONG-IDT             , :AE3ONG-TIT             ,
+               :AE3ONG-POS             , :AE3ONG-RCP             ,
+               :AE3ONG-IDT-MDE
+           END-EXEC
+           .
+      
+      
+      *=================================================================
+      *    Traitement des fonctions de type "MODIFICATION"
+      *
+      *
+      *    !! Veiller à ne mettre à jour que les colonnes nécessaires !!
+      *    !! (La requête générée modifie l'ensemble des colonnes     !!
+      *    !!  déclarées pour la table. Dans un soucis de performance,!!
+      *    !!  il convient de ne retenir que les colonnes qui doivent !!
+      *    !!  réellement être modifiées).                            !!
+      *
+      *=================================================================
+      
+      *-----------------------------------------------------------------
+      *    M0001 : Modification ........................................
+      *-----------------------------------------------------------------
+       M0001-FUNCT-PROCESSING.
+      *-----------------------
+           MOVE 'M0001-FUNCT-PROCESSING'          TO W-Lbl
+      
+           EXEC SQL
+             UPDATE TAE3ONG
+             SET
+               AE3ONG_TIT          = :AE3ONG-TIT             ,
+               AE3ONG_POS          = :AE3ONG-POS             ,
+               AE3ONG_RCP          = :AE3ONG-RCP
+             WHERE AE3ONG_IDT          = :AE3MON-IDT
+             AND AE3ONG_IDT_MDE        = :AE3MON-IDT-MDE
+           END-EXEC
+           .
+      
+      
+      *=================================================================
+      *    Traitement des fonctions de type "SUPPRESSION"
+      *=================================================================
+      
+      *-----------------------------------------------------------------
+      *    S0001 : Suppression .........................................
+      *-----------------------------------------------------------------
+       S0001-FUNCT-PROCESSING.
+      *-----------------------
+           MOVE 'S0001-FUNCT-PROCESSING'          TO W-Lbl
+      
+           EXEC SQL
+             DELETE FROM TAE3ONG
+             WHERE AE3ONG_IDT          = :AE3MON-IDT
+             AND AE3ONG_IDT_MDE        = :AE3MON-IDT-MDE
+           END-EXEC.
+      
+      
+      *=================================================================
+      *    Traitement des fonctions de type "INSERTION"
+      *
+      *=================================================================
+      
+      *-----------------------------------------------------------------
+      *    I0001 : Insertion .........................................
+      *-----------------------------------------------------------------
+       I0001-FUNCT-PROCESSING.
+      *--------------
+           MOVE 'I0001-FUNCT-PROCESSING'          TO W-Lbl
+      
+           EXEC SQL
+             INSERT INTO TAE3ONG
+               (
+               AE3ONG_IDT,
+               AE3ONG_TIT,
+               AE3ONG_POS,
+               AE3ONG_RCP,
+               AE3ONG_IDT_MDE
+               )
+             VALUES
+               (
+               :AE3ONG-IDT,
+               :AE3ONG-TIT,
+               :AE3ONG-POS,
+               :AE3ONG-RCP,
+               :AE3ONG-IDT-MDE
+               )
+           END-EXEC
+           .
+      
+      
+      
+      *=================================================================
+      *    Interprétation du code retour SQL pour alimentation du
+      *    message métier
+      *=================================================================
+       SQL-ERROR-PROCESSING.
+      *---------------------
+           MOVE SQLCODE                             TO DB2RET-SQLCODE
+      D    DISPLAY ' SQL-ERROR-PROCESSING'
+      D    DISPLAY ' SQLCODE     :'  SQLCODE
+           EVALUATE TRUE
+              WHEN DB2RET-NON-TROUVE
+                    SET W-Err-NotFound              TO TRUE
+              WHEN DB2RET-ERR-DATE-TIME
+                    SET W-Err-InvalidDateTime       TO TRUE
+              WHEN DB2RET-EXISTE-DEJA
+                    SET W-Err-DuplicateKey          TO TRUE
+              WHEN DB2RET-ERR-INTEGRITE
+                    SET W-Err-UnknownParentKey      TO TRUE
+              WHEN DB2RET-ERR-CLE-PRIMAIRE
+                    SET W-Err-NoUpdateOfParentKey   TO TRUE
+              WHEN DB2RET-ERR-STRUCTURE
+                    SET W-Err-IncompatibelFormat    TO TRUE
+              WHEN OTHER
+      *             -- Constitution du message retour technique
+      *                si erreur DB2
+                    SET W-Err-DB2 TO TRUE
+                    MOVE C-PgmNme TO AE3FRE-ExeCnd-TecErrMsg-Pgm
+                    MOVE W-SQLStmt TO AE3FRE-ExeCnd-TecErrMsg-Ord
+                    MOVE SQLCODE  TO W-SQLCod
+                    MOVE W-SQLCod TO AE3FRE-ExeCnd-TecErrMsg-Cod
+                    STRING 'Erreur DB2 ' W-SQLCOD ' DANS '
+                           C-PgmNme ':' W-Lbl
+                           DELIMITED BY SIZE
+                           INTO      AE3FRE-ExeCnd-TecErrMsg-Msg
+                    MOVE AE3FRE-ExeCnd-TecErrMsg-Msg
+                      TO AE3FRE-BizErrMsg-Msg
+      
+      *             -- Appel ZDB2DSP pour display du message d'erreur
+                    PERFORM CALL-ZDB2DSP
+           END-EVALUATE
+           .
+      
+      *=================================================================
+      *    CALL-ZDB2DSP  - Formatage des messages d'erreur DB2 -
+      *=================================================================
+       CALL-ZDB2DSP.
+      *-------------
+           MOVE SPACES TO DB2DSP
+           MOVE C-PgmNme                 TO DB2DSP-IDE-ACE
+           MOVE W-SQLStmt                TO DB2DSP-IDE-ACN
+           MOVE 'TAE3ONG '               TO DB2DSP-IDE-TAB
+           MOVE W-Lbl                    TO DB2DSP-IDE-LBL
+           MOVE AE3FAL-MsgOri-UsrLgqIdt         TO DB2DSP-IDE-LGE
+           MOVE AE3FAL-MsgOri-UsrPhyIdt         TO DB2DSP-IDE-PHY
+      
+           CALL 'ZCALLPGM' USING C-ZDB2DSP
+                                 DB2DSP
+                                 SQLCA
+           END-CALL
+           .
+       END PROGRAM AE3PONG.
+      
+      
