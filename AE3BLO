@@ -1,0 +1,58 @@
+      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+      *-Maintenance frame - Created on 22 May 2025 at 11:23:24
+      *-============================================================
+      *-Descent : 22/05/2025 at 11:23:24          MemoId  : DOUKOUNA
+      *-Reason  : ECHANG-GENERIQUE-INTERVIEW
+      *-More    :
+      *-============================================================
+      *-End of frame
+      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+      *================================================================*
+      * SKEL  : SQECPDTB V1.0
+      *
+      * TAE3BLO  : Table des blocs
+      *
+      * LONGUEUR : 770
+      *================================================================*
+      
+      *01  T:AE3BLO:.
+      
+      *[Dsc] BLOC IDENTIFIANT
+           10 :AE3BLO:-IDT                     PIC S9(5) COMP-3.
+      
+      *[Dsc] BLOC IDENTIFIANT PARENT
+           10 :AE3BLO:-IDT-PNT                 PIC S9(5) COMP-3.
+      
+      *[Dsc] BLOC TITRE
+           10 :AE3BLO:-TIT                     PIC X(200).
+      
+      *[Dsc] BLOC VISIBLE
+           10 :AE3BLO:-VSB                     PIC X(1).
+      
+      *[Dsc] BLOC TYPE
+           10 :AE3BLO:-TYP                     PIC X(50).
+      
+      *[Dsc] BLOC OPTION
+           10 :AE3BLO:-OPN                     PIC X(1).
+      
+      *[Dsc] BLOC ORDRE
+           10 :AE3BLO:-ORD                     PIC S9(09) COMP.
+      
+      *[Dsc] BLOC AFFICHER CERTIFICAT
+           10 :AE3BLO:-AFG-CER                 PIC X(1).
+      
+      *[Dsc] BLOC AFFICHER
+           10 :AE3BLO:-AFG                     PIC X(1).
+      
+      *[Dsc] BLOC RECAPITULATIF
+           10 :AE3BLO:-RCP                     PIC X(1).
+      
+      *[Dsc] BLOC ONGLET IDENTIFIANT
+           10 :AE3BLO:-IDT-ONG                 PIC S9(5) COMP-3.
+      
+      *[Dsc] BLOC LIBELLE
+           10 :AE3BLO:-LIB.
+              49 :AE3BLO:-LIB-LEN              PIC S9(4) COMP-5.
+              49 :AE3BLO:-LIB-TEXT             PIC X(500).
+      
+      
