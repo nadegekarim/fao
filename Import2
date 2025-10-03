@@ -1,0 +1,199 @@
+private List<ImportationDonneeVM> RemplieList()
+{
+    List<ImportationDonneeVM> importationDonneeList = new List<ImportationDonneeVM>();
+    Encoding encode = Encoding.GetEncoding("utf-8");
+
+    // --- Étape 1 : Lecture des Onglets ---
+    using (StreamReader datasTXT = new StreamReader(Data.InputFile.Open(), encode))
+    {
+        string fileName = Data.InputFile.FileName;
+        int lineNumber = 0;
+        while (!datasTXT.EndOfStream)
+        {
+            lineNumber++;
+            var ligne = datasTXT.ReadLine();
+            string[] valeurs = ligne.Split(';');
+
+            if (valeurs.Length != 5)
+                throw new UserException(UserMessages.DataPerLineModele(I18N.Translate(fileName), "5"));
+
+            if (string.IsNullOrWhiteSpace(valeurs[0]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Identifiant onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[1]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Le libellé de l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[2]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("La position de l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O" && valeurs[3] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O si l'onglet est un recapitulatif sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            uint idOnglet = Convert.ToUInt32(valeurs[0]);
+            string libelleOnglet = valeurs[1];
+            uint positionOnglet = Convert.ToUInt32(valeurs[2]);
+            string recapOnglet = valeurs[3];
+            uint idModele = Convert.ToUInt32(Data.IdModele);
+
+            importationDonneeList.Add(new ImportationDonneeVM
+            {
+                IdtMdE = idModele,
+                IdtOng = idOnglet,
+                TitOng = libelleOnglet,
+                PosOng = (int)positionOnglet,
+                RcpOng = recapOnglet
+            });
+        }
+    }
+
+    // --- Étape 2 : Lecture des Blocs ---
+    using (StreamReader datasTXT = new StreamReader(Data.InputFileBlo.Open(), encode))
+    {
+        string fileName = Data.InputFileBlo.FileName;
+        int lineNumber = 0;
+        while (!datasTXT.EndOfStream)
+        {
+            lineNumber++;
+            var ligne = datasTXT.ReadLine();
+            string[] valeurs = ligne.Split(';');
+
+            if (valeurs.Length != 12)
+                throw new UserException(UserMessages.DataPerLineModele(I18N.Translate(fileName), "12"));
+
+            if (string.IsNullOrWhiteSpace(valeurs[0]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Identifiant Bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[2]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Le titre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O pour que le bloc soit visible"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[4]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Le type du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[5]) || (valeurs[5] != "O" && valeurs[5] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O si le bloc est optionnel sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[6]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("L'ordre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[9]) || (valeurs[9] != "O" && valeurs[9] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O si le bloc doit être sur le recapitulatif sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[10]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Identifiant Onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            uint idBloc = Convert.ToUInt32(valeurs[0]);
+            uint idParentBloc = Convert.ToUInt32(valeurs[1]);
+            string titreBloc = valeurs[2];
+            string visible = valeurs[3];
+            string typeBloc = valeurs[4];
+            string optionBloc = valeurs[5];
+            uint ordreBloc = Convert.ToUInt32(valeurs[6]);
+            string affichCertifBloc = valeurs[7];
+            string affichBloc = valeurs[8];
+            string recapBloc = valeurs[9];
+            uint idOngletBloc = Convert.ToUInt32(valeurs[10]);
+            string libelleBloc = valeurs[11];
+
+            var onglet = importationDonneeList.FirstOrDefault(b => b.IdtOng == idOngletBloc);
+            if (onglet != null)
+            {
+                // On enrichit l’onglet avec le bloc
+                onglet.IdtBlo = idBloc;
+                onglet.IdtPntBlo = idParentBloc;
+                onglet.TitBlo = titreBloc;
+                onglet.VsbBlo = visible;
+                onglet.TypBlo = typeBloc;
+                onglet.OpnBlo = optionBloc;
+                onglet.OrdBlo = (int)ordreBloc;
+                onglet.AfgCer = affichCertifBloc;
+                onglet.AfgBlo = affichBloc;
+                onglet.RcpBlo = recapBloc;
+                onglet.LibBlo = libelleBloc;
+            }
+        }
+    }
+
+    // --- Étape 3 : Lecture des Données ---
+    using (StreamReader datasTXT = new StreamReader(Data.InputFileDon.Open(), encode))
+    {
+        string fileName = Data.InputFileDon.FileName;
+        int lineNumber = 0;
+        while (!datasTXT.EndOfStream)
+        {
+            lineNumber++;
+            var ligne = datasTXT.ReadLine();
+            string[] valeurs = ligne.Split(';');
+
+            if (valeurs.Length != 19)
+                throw new UserException(UserMessages.DataPerLineModele(I18N.Translate(fileName), "19"));
+
+            if (string.IsNullOrWhiteSpace(valeurs[0]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Identifiant Donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[3]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Le libellé de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[4]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Le type de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[6]) || (valeurs[6] != "O" && valeurs[6] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O pour que la donnée s'affiche sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[7]) || (valeurs[7] != "O" && valeurs[7] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O si la donnée est personnalisable sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[11]))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("Identifiant bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[15]) || (valeurs[15] != "O" && valeurs[15] != "N"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("O si la donnée est obligatoire sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            if (string.IsNullOrWhiteSpace(valeurs[16]) || (valeurs[16] != "C" && valeurs[16] != "M" && valeurs[16] != "B"))
+                throw new UserException(UserMessages.EmptyColumn(I18N.Translate("C si la donnée est Collaborateur, M pour Manager sinon B"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+
+            uint idDon = Convert.ToUInt32(valeurs[0]);
+            string libelleDon = valeurs[3];
+            string typeDon = valeurs[4];
+            string typeCplDn = valeurs[5];
+            string affichDon = valeurs[6];
+            string persDon = valeurs[7];
+            string valeurInitDon = valeurs[8];
+            string objectifsDon = valeurs[9];
+            uint idParentDon = Convert.ToUInt32(valeurs[10]);
+            uint idBlocDon = Convert.ToUInt32(valeurs[11]);
+            string tooltipDon = valeurs[12];
+            string libelleRecapDon = valeurs[13];
+            string labelInfoDon = valeurs[14];
+            string obligDon = valeurs[15];
+            string auteurDon = valeurs[16];
+            string valeurMinDon = valeurs[17];
+            string valeurMaxDon = valeurs[18];
+
+            var bloc = importationDonneeList.FirstOrDefault(b => b.IdtBlo == idBlocDon);
+            if (bloc != null)
+            {
+                bloc.IdtDon = idDon;
+                bloc.LibDon = libelleDon;
+                bloc.TypDon = typeDon;
+                bloc.TypCplDon = typeCplDn;
+                bloc.AfgDon = affichDon;
+                bloc.PrsDon = persDon;
+                bloc.ValInitialeDon = valeurInitDon;
+                bloc.ObjectifsDon = objectifsDon;
+                bloc.IdtPntDon = idParentDon;
+                bloc.TtpDon = tooltipDon;
+                bloc.LibRcpDon = libelleRecapDon;
+                bloc.LblIfrDon = labelInfoDon;
+                bloc.OblDon = obligDon;
+                bloc.AurDon = auteurDon;
+                bloc.ValeurMinDon = valeurMinDon;
+                bloc.ValeurMaxDon = valeurMaxDon;
+            }
+        }
+    }
+
+    return importationDonneeList;
+}
