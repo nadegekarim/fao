@@ -1,0 +1,132 @@
+private List<ImportationDonneeVM> RemplieList()
+{
+    Encoding encode = Encoding.UTF8;
+    var importationDonneeList = LireOnglets(Data.InputFile.Open(), Data.InputFile.FileName, encode, (uint)Data.IdModele);
+    LireBlocs(Data.InputFileBlo.Open(), Data.InputFileBlo.FileName, encode, importationDonneeList);
+    LireDonnees(Data.InputFileDon.Open(), Data.InputFileDon.FileName, encode, importationDonneeList);
+
+    return importationDonneeList;
+}
+
+#region Lecture Onglets
+private List<ImportationDonneeVM> LireOnglets(Stream fileStream, string fileName, Encoding encoding, uint idModele)
+{
+    var list = new List<ImportationDonneeVM>();
+    foreach (var (valeurs, lineNumber) in ReadCsv(fileStream, encoding, 5, fileName))
+    {
+        ThrowIfEmpty(valeurs[0], "Identifiant onglet", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[1], "Le libellé de l'onglet", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[2], "La position de l'onglet", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[3], "O si l'onglet est un recapitulatif sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+
+        list.Add(new ImportationDonneeVM
+        {
+            IdtMdE = idModele,
+            IdtOng = ToUInt(valeurs[0]),
+            TitOng = valeurs[1],
+            PosOng = (int)ToUInt(valeurs[2]),
+            RcpOng = valeurs[3]
+        });
+    }
+    return list;
+}
+#endregion
+
+#region Lecture Blocs
+private void LireBlocs(Stream fileStream, string fileName, Encoding encoding, List<ImportationDonneeVM> onglets)
+{
+    foreach (var (valeurs, lineNumber) in ReadCsv(fileStream, encoding, 12, fileName))
+    {
+        ThrowIfEmpty(valeurs[0], "Identifiant Bloc", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[2], "Le titre du bloc", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[3], "O pour que le bloc soit visible", fileName, lineNumber, v => v == "O");
+        ThrowIfEmpty(valeurs[4], "Le type du bloc", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[5], "O si le bloc est optionnel sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+        ThrowIfEmpty(valeurs[6], "L'ordre du bloc", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[9], "O si le bloc doit être sur le recapitulatif sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+        ThrowIfEmpty(valeurs[10], "Identifiant Onglet", fileName, lineNumber);
+
+        var onglet = onglets.FirstOrDefault(b => b.IdtOng == ToUInt(valeurs[10]));
+        if (onglet != null)
+        {
+            onglet.IdtBlo = ToUInt(valeurs[0]);
+            onglet.IdtPntBlo = ToUInt(valeurs[1]);
+            onglet.TitBlo = valeurs[2];
+            onglet.VsbBlo = valeurs[3];
+            onglet.TypBlo = valeurs[4];
+            onglet.OpnBlo = valeurs[5];
+            onglet.OrdBlo = (int)ToUInt(valeurs[6]);
+            onglet.AfgCer = valeurs[7];
+            onglet.AfgBlo = valeurs[8];
+            onglet.RcpBlo = valeurs[9];
+            onglet.LibBlo = valeurs[11];
+        }
+    }
+}
+#endregion
+
+#region Lecture Données
+private void LireDonnees(Stream fileStream, string fileName, Encoding encoding, List<ImportationDonneeVM> blocs)
+{
+    foreach (var (valeurs, lineNumber) in ReadCsv(fileStream, encoding, 19, fileName))
+    {
+        ThrowIfEmpty(valeurs[0], "Identifiant Donnée", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[3], "Le libellé de la donnée", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[4], "Le type de la donnée", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[6], "O pour que la donnée s'affiche sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+        ThrowIfEmpty(valeurs[7], "O si la donnée est personnalisable sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+        ThrowIfEmpty(valeurs[11], "Identifiant bloc", fileName, lineNumber);
+        ThrowIfEmpty(valeurs[15], "O si la donnée est obligatoire sinon N", fileName, lineNumber, v => v == "O" || v == "N");
+        ThrowIfEmpty(valeurs[16], "C si la donnée est Collaborateur, M pour Manager sinon B", fileName, lineNumber, v => v == "C" || v == "M" || v == "B");
+
+        var bloc = blocs.FirstOrDefault(b => b.IdtBlo == ToUInt(valeurs[11]));
+        if (bloc != null)
+        {
+            bloc.IdtDon = ToUInt(valeurs[0]);
+            bloc.LibDon = valeurs[3];
+            bloc.TypDon = valeurs[4];
+            bloc.TypCplDon = valeurs[5];
+            bloc.AfgDon = valeurs[6];
+            bloc.PrsDon = valeurs[7];
+            bloc.ValInitialeDon = valeurs[8];
+            bloc.ObjectifsDon = valeurs[9];
+            bloc.IdtPntDon = ToUInt(valeurs[10]);
+            bloc.TtpDon = valeurs[12];
+            bloc.LibRcpDon = valeurs[13];
+            bloc.LblIfrDon = valeurs[14];
+            bloc.OblDon = valeurs[15];
+            bloc.AurDon = valeurs[16];
+            bloc.ValeurMinDon = valeurs[17];
+            bloc.ValeurMaxDon = valeurs[18];
+        }
+    }
+}
+#endregion
+
+#region Helpers
+private IEnumerable<(string[] valeurs, int lineNumber)> ReadCsv(Stream stream, Encoding encoding, int expectedCols, string fileName)
+{
+    using var reader = new StreamReader(stream, encoding);
+    int lineNumber = 0;
+    while (!reader.EndOfStream)
+    {
+        lineNumber++;
+        var line = reader.ReadLine() ?? "";
+        var valeurs = line.Split(';');
+        if (valeurs.Length != expectedCols)
+            throw new UserException(UserMessages.DataPerLineModele(I18N.Translate(fileName), expectedCols.ToString()));
+        yield return (valeurs, lineNumber);
+    }
+}
+
+private void ThrowIfEmpty(string value, string columnName, string fileName, int lineNumber, Func<string, bool>? validator = null)
+{
+    if (string.IsNullOrWhiteSpace(value) || (validator != null && !validator(value)))
+        throw new UserException(UserMessages.EmptyColumn(I18N.Translate(columnName), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+}
+
+private uint ToUInt(string value)
+{
+    return uint.TryParse(value, out var result) ? result : throw new UserException($"Impossible de convertir '{value}' en entier positif.");
+}
+#endregion
