@@ -1,0 +1,157 @@
+internal class ImportDonneesGeneric : ObjectPageStep<ImportDonneesGenericViewModel, ListModelActivity>
+{
+    private static readonly Encoding FileEncoding = Encoding.GetEncoding("utf-8");
+
+    public void Prepare(string id, string nom, string refMde)
+    {
+        Data.IdModele = id;
+        Data.NomModele = nom;
+        Data.RefModele = refMde;
+    }
+
+    [RestoreData]
+    [Submission(ShowWaitingMessage = true)]
+    [DefaultNextStep(target: typeof(ListModel))]
+    public NextStepId DoValidateAndConfirm()
+    {
+        CheckSaisie();
+
+        ProcessFile(Data.InputFile, 5, ValidateOnglet, InsertOnglet);
+        ProcessFile(Data.InputFileBlo, 12, ValidateBloc, InsertBloc);
+        ProcessFile(Data.InputFileDon, 19, ValidateDonnee, InsertDonnee);
+
+        Messages.Add(new UserMessage(MessageType.SUCCESS, "{0}", "Importation des fichiers effectuée."));
+        return NextStepId.Default();
+    }
+
+    private void CheckSaisie()
+    {
+        ValidateFile(Data.InputFile, "Data/InputFile", "NoFileToUploadOnglet", "FileFormatOnglet");
+        ValidateFile(Data.InputFileBlo, "Data/InputFileBlo", "NoFileToUploadBloc", "FileFormatBloc");
+        ValidateFile(Data.InputFileDon, "Data/InputFileDon", "NoFileToUploadDonnee", "FileFormatDonnee");
+    }
+
+    private void ValidateFile(UploadedFile file, string errorKey, string noFileKey, string formatKey)
+    {
+        if (UploadedFile.IsNullOrNotUploaded(file))
+            throw new UserException(UserMessages.Resource(noFileKey));
+
+        if (file.ContentType != "text/plain")
+            throw new UserException(UserMessages.Resource(formatKey, ".txt"));
+    }
+
+    private void ProcessFile(UploadedFile file, int expectedColumns, Action<string[], int, string> validator, Action<string[]> inserter)
+    {
+        using StreamReader reader = new(file.Open(), FileEncoding);
+        string fileName = file.FileName;
+        int lineNumber = 0;
+
+        while (!reader.EndOfStream)
+        {
+            lineNumber++;
+            var line = reader.ReadLine();
+            var values = line.Split(';');
+
+            if (values.Length != expectedColumns)
+                Errors.AddErrorMessage(fileName, UserMessages.DataPerLineModele(I18N.Translate(fileName), expectedColumns.ToString()));
+
+            validator(values, lineNumber, fileName);
+            inserter(values);
+        }
+    }
+
+    #region Onglet
+    private void ValidateOnglet(string[] valeurs, int line, string file)
+    {
+        ValidateRequired(valeurs[0], "Identifiant onglet", line, file);
+        ValidateRequired(valeurs[1], "Le libellé de l'onglet", line, file);
+        ValidateRequired(valeurs[2], "La position de l'onglet", line, file);
+        ValidateInSet(valeurs[3], new[] { "O", "N" }, "O si l'onglet est un récapitulatif sinon N", line, file);
+    }
+
+    private void InsertOnglet(string[] v)
+    {
+        uint? idOnglet = Convert.ToUInt32(v[0]);
+        uint? idModele = Convert.ToUInt32(Data.IdModele);
+        string libelle = v[1];
+        uint position = Convert.ToUInt32(v[2]);
+        string recap = v[3];
+        AppelMetier.InsertionOngletModele(idOnglet, idModele, libelle, position, recap);
+    }
+    #endregion
+
+    #region Bloc
+    private void ValidateBloc(string[] v, int line, string file)
+    {
+        ValidateRequired(v[0], "Identifiant Bloc", line, file);
+        ValidateRequired(v[2], "Le titre du bloc", line, file);
+        ValidateInSet(v[3], new[] { "O" }, "O pour que le bloc soit visible", line, file);
+        ValidateRequired(v[4], "Le type du bloc", line, file);
+        ValidateInSet(v[5], new[] { "O", "N" }, "O si le bloc est optionnel sinon N", line, file);
+        ValidateRequired(v[6], "L'ordre du bloc", line, file);
+        ValidateInSet(v[9], new[] { "O", "N" }, "O si le bloc doit être sur le récapitulatif sinon N", line, file);
+        ValidateRequired(v[10], "Identifiant Onglet", line, file);
+    }
+
+    private void InsertBloc(string[] v)
+    {
+        AppelMetier.InsertionBlocModele(
+            Convert.ToUInt32(v[0]),
+            ConvertNullableUInt(v[1]),
+            v[2],
+            v[3],
+            v[4],
+            v[5],
+            Convert.ToUInt32(v[6]),
+            v[7],
+            v[8],
+            v[9],
+            Convert.ToUInt32(v[10]),
+            v[11]
+        );
+    }
+    #endregion
+
+    #region Donnée
+    private void ValidateDonnee(string[] v, int line, string file)
+    {
+        ValidateRequired(v[0], "Identifiant Donnée", line, file);
+        ValidateRequired(v[3], "Le libellé de la donnée", line, file);
+        ValidateRequired(v[4], "Le type de la donnée", line, file);
+        ValidateInSet(v[6], new[] { "O", "N" }, "O pour que la donnée s'affiche sinon N", line, file);
+        ValidateInSet(v[7], new[] { "O", "N" }, "O si la donnée est personnalisable sinon N", line, file);
+        ValidateRequired(v[11], "Identifiant Bloc", line, file);
+        ValidateInSet(v[15], new[] { "O", "N" }, "O si la donnée est obligatoire sinon N", line, file);
+        ValidateInSet(v[16], new[] { "C", "M", "B" }, "C si la donnée est Collaborateur, M pour Manager sinon B", line, file);
+    }
+
+    private void InsertDonnee(string[] v)
+    {
+        AppelMetier.InsertionDonGenModele(
+            Convert.ToUInt32(v[0]),
+            Convert.ToUInt32(Data.IdModele),
+            v[3], v[4], v[5], v[6], v[7], v[8], v[9],
+            ConvertNullableUInt(v[10]),
+            ConvertNullableUInt(v[11]),
+            v[12], v[13], v[14], v[15], v[16], v[17], v[18]
+        );
+    }
+    #endregion
+
+    #region Utils
+    private void ValidateRequired(string value, string field, int line, string file)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            Errors.AddErrorMessage(file, UserMessages.EmptyColumn(I18N.Translate(field), line.ToString(), I18N.Translate(file)));
+    }
+
+    private void ValidateInSet(string value, string[] allowed, string field, int line, string file)
+    {
+        if (string.IsNullOrWhiteSpace(value) || !allowed.Contains(value))
+            Errors.AddErrorMessage(file, UserMessages.EmptyColumn(I18N.Translate(field), line.ToString(), I18N.Translate(file)));
+    }
+
+    private uint? ConvertNullableUInt(string value)
+        => uint.TryParse(value, out uint result) ? result : null;
+    #endregion
+}
