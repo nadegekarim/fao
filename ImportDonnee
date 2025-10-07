@@ -1,0 +1,445 @@
+internal class ImportDonneesGeneric : ObjectPageStep<ImportDonneesGenericViewModel, ListModelActivity>
+{
+    /// <summary>
+    /// Préparation des données de la page
+    /// </summary>
+    public void Prepare(string id, string nom, string refMde)
+    {
+        Data.IdModele = id;
+        Data.NomModele = nom;
+        Data.RefModele = refMde;
+
+    }
+
+
+
+    [RestoreData]
+    [Submission(ShowWaitingMessage = true)]
+    [DefaultNextStep(target: typeof(ListModel))]
+    public NextStepId DoValidateAndConfirm()
+    {
+        CheckSaisie();
+        saveOnglet();
+        saveBloc();
+        saveDonnee();
+        string message = "Importation des fichiers effectuées.";
+        Messages.Add(new UserMessage(MessageType.SUCCESS, "{0}", message));
+        //Retour à la liste des modèles
+        return NextStepId.Default();
+    }
+
+    private void CheckSaisie()
+    {
+        
+        //Vérification que le fichier onglet uploadé est existant et au bon format
+        if (UploadedFile.IsNullOrNotUploaded(Data.InputFile))
+        {
+            throw new UserException(UserMessages.NoFileToUploadOnglet());
+        }
+
+        if (Data.InputFile.ContentType != "text/plain")
+        {
+            throw new UserException(UserMessages.FileFormatOnglet(".txt"));
+        }
+        //Vérification que le fichier Bloc uploadé est existant et au bon format
+        if (UploadedFile.IsNullOrNotUploaded(Data.InputFileBlo))
+        {
+            throw new UserException(UserMessages.NoFileToUploadBloc());
+        }
+
+        if (Data.InputFileBlo.ContentType != "text/plain")
+        {
+            throw new UserException(UserMessages.FileFormatBloc(".txt"));
+        }
+        //Vérification que le fichier Donnée uploadé est existant et au bon format
+        if (UploadedFile.IsNullOrNotUploaded(Data.InputFileDon))
+        {
+            throw new UserException(UserMessages.NoFileToUploadDonnee());
+        }
+
+        if (Data.InputFileDon.ContentType != "text/plain")
+        {
+            throw new UserException(UserMessages.FileFormatDonnee(".txt"));
+        }
+
+    }
+
+    private void saveOnglet()
+    {
+        //Récupération du contenu du txt
+        Encoding encode = Encoding.GetEncoding("utf-8");
+        using (StreamReader datasTXT = new StreamReader(Data.InputFile.Open(), encode))
+        {
+            string fileName = Data.InputFile.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 5)
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.DataPerLineModele(I18N.Translate(fileName), "5"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("Identifiant onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[1]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("Le libellé de  l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[2]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("La position de l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O" && valeurs[3] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("O si l'onglet est un recapitulatif  sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+
+
+                //Formatage des onglets
+                uint? idOnglet = Convert.ToUInt32(valeurs[0]);
+                string libelleOnglet = valeurs[1];
+                uint positionOnglet = Convert.ToUInt32(valeurs[2]);
+                string RecapOnglet = valeurs[3];
+                uint? idModele = Convert.ToUInt32(Data.IdModele);
+                //Insertion de la donnée
+                AppelMetier.InsertionOngletModele(idOnglet, idModele, libelleOnglet, positionOnglet, RecapOnglet);
+            }
+        }
+    }
+
+    private void saveBloc()
+    {
+        //Récupération du contenu du txt
+        Encoding encode = Encoding.GetEncoding("utf-8");
+        using (StreamReader datasTXT = new StreamReader(Data.InputFileBlo.Open(), encode))
+        {
+            string fileName = Data.InputFileBlo.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 12)
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.DataPerLineModele(I18N.Translate(fileName),"12"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Identifiant Bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[2]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Le titre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O pour que le soit visible"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[4]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Le type du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[5]) || (valeurs[5] != "O" && valeurs[5] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O si le bloc est optionnel sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[6]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("L'ordre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[9]) || (valeurs[9] != "O" && valeurs[9] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O si le bloc doit être sur le recapitulatif sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[10]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Identifiant Onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+
+
+                //Formatage des blocs
+                uint? idBloc = Convert.ToUInt32(valeurs[0]);
+                uint? idParentBloc = Convert.ToUInt32(valeurs[1]);
+                string titreBloc = valeurs[2];
+                string visible = valeurs[3];
+                string typeBloc = valeurs[4];
+                string optionBloc = valeurs[5];
+                uint? ordreBloc = Convert.ToUInt32(valeurs[6]);
+                string affichCertifBloc = valeurs[7];
+                string affichBloc = valeurs[8];
+                string recapBloc = valeurs[9];
+                uint idOngletBloc = Convert.ToUInt32(valeurs[10]);
+                string libelleBloc = valeurs[11];
+
+                //Insertion de la donnée
+                AppelMetier.InsertionBlocModele(idBloc,idParentBloc,titreBloc,visible,typeBloc,optionBloc,ordreBloc,affichCertifBloc,affichBloc,recapBloc, idOngletBloc, libelleBloc);
+            }
+        }
+    }
+
+    private void saveDonnee()
+    {
+        //Récupération du contenu du txt
+        Encoding encode = Encoding.GetEncoding("utf-8");
+        using (StreamReader datasTXT = new StreamReader(Data.InputFileDon.Open(), encode))
+        {
+            string fileName = Data.InputFileDon.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 19)
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.DataPerLineModele(I18N.Translate(fileName), "19"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Identifiant Donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Le libellée de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[4]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Le type de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[6]) || (valeurs[6] != "O" && valeurs[6] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O pour que la donnée s'affiche sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[7]) || (valeurs[7] != "O" && valeurs[7] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O si la donnée est personnalisable sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[11]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Identifiant bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[15]) || (valeurs[15] != "O" && valeurs[15] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O si la donnée est obligatoire sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[16]) || (valeurs[16] != "C" && valeurs[16] != "M" && valeurs[16] != "B"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("C si la donnée est collaborateur, M pour Manager sinon B"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                //Formatage des données
+                uint? idDon = Convert.ToUInt32(valeurs[0]);
+                uint? idModele = Convert.ToUInt32(Data.IdModele);
+                string libelleDon = valeurs[3];
+                string typeDon = valeurs[4];
+                string typeCplDn = valeurs[5];
+                string AffichDon = valeurs[6];
+                string persDon = valeurs[7];
+                string ValeurInitDon = valeurs[8];
+                string objectifsDon = valeurs[9];
+                uint? idParentDon = Convert.ToUInt32(valeurs[10]);
+                uint? idBlocDon = Convert.ToUInt32(valeurs[11]);
+                string tooltipDon = valeurs[12];
+                string libelleRecapDon = valeurs[13];
+                string labelInfoDon = valeurs[14];
+                string obligDon = valeurs[15];
+                string auteurDon = valeurs[16];
+                string valeurMinDon = valeurs[17];
+                string valeurMaxDon = valeurs[18];
+                //Insertion de la donnée
+                AppelMetier.InsertionDonGenModele(idDon,idModele,libelleDon,typeDon,typeCplDn,AffichDon,persDon,ValeurInitDon,objectifsDon,idParentDon,idBlocDon,tooltipDon,libelleRecapDon,labelInfoDon,obligDon,auteurDon,valeurMinDon,valeurMaxDon);
+            }
+        }
+    }
+  
+
+
+    [RestoreData]
+    [DefaultNextStep(target: typeof(ListModel))]
+    public NextStepId DoCancel()
+    {
+        return NextStepId.Default();
+    }
+
+    [DefaultNextStep(typeof(ImportGenericModeleVisuActivityStep))]
+    [RestoreData]
+    [Submission]
+    public NextStepId GoVisualisation()
+    {
+        Encoding encode = Encoding.GetEncoding("utf-8");
+        List<string> strings = new List<string>();
+        List<string> stringsblo = new List<string>();
+        List<string> stringsdon = new List<string>();
+        using (StreamReader datasTXT = new StreamReader(Data.InputFile.Open(), encode))
+        {
+            string fileName = Data.InputFile.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 5)
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.DataPerLineModele(I18N.Translate(fileName), "5"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("Identifiant onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[1]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("Le libellé de  l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[2]))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", UserMessages.EmptyColumn(I18N.Translate("La position de l'onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O" && valeurs[3] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFile", (UserMessages.EmptyColumn(I18N.Translate("O si l'onglet est un recapitulatif  sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                strings.Add(ligne);
+
+            }
+        }
+        using (StreamReader datasTXT = new StreamReader(Data.InputFileBlo.Open(), encode))
+        {
+            string fileName = Data.InputFileBlo.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 12)
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.DataPerLineModele(I18N.Translate(fileName), "12"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Identifiant Bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[2]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Le titre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]) || (valeurs[3] != "O"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O pour que le soit visible"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[4]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Le type du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[5]) || (valeurs[5] != "O" && valeurs[5] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O si le bloc est optionnel sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[6]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("L'ordre du bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[9]) || (valeurs[9] != "O" && valeurs[9] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("O si le bloc doit être sur le recapitulatif sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[10]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileBlo", UserMessages.EmptyColumn(I18N.Translate("Identifiant Onglet"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                stringsblo.Add(ligne);
+            }
+        }
+        using (StreamReader datasTXT = new StreamReader(Data.InputFileDon.Open(), encode))
+        {
+            string fileName = Data.InputFileDon.FileName;
+            int lineNumber = 0;
+            while (!datasTXT.EndOfStream)
+            {
+                lineNumber++;
+                var ligne = datasTXT.ReadLine();
+                string[] valeurs = ligne.Split(';');
+
+                if (valeurs.Count() != 19)
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.DataPerLineModele(I18N.Translate(fileName), "19"));
+                }
+
+                if (string.IsNullOrWhiteSpace(valeurs[0]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", (UserMessages.EmptyColumn(I18N.Translate("Identifiant Donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[3]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Le libellée de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[4]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Le type de la donnée"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[6]) || (valeurs[6] != "O" && valeurs[6] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O pour que la donnée s'affiche sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[7]) || (valeurs[7] != "O" && valeurs[7] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O si la donnée est personnalisable sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[11]))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("Identifiant bloc"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[15]) || (valeurs[15] != "O" && valeurs[15] != "N"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("O si la donnée est obligatoire sinon N"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                if (string.IsNullOrWhiteSpace(valeurs[16]) || (valeurs[16] != "C" && valeurs[16] != "M" && valeurs[16] != "B"))
+                {
+                    Errors.AddErrorMessage("Data/InputFileDon", UserMessages.EmptyColumn(I18N.Translate("C si la donnée est collaborateur, M pour Manager sinon B"), I18N.Translate(lineNumber.ToString()), I18N.Translate(fileName)));
+                }
+                stringsdon.Add(ligne);
+            }
+        }
+       
+        GenericInterviewsActivityParameters param = new GenericInterviewsActivityParameters()
+        {
+            CodePage = Convert.ToUInt32(Data.IdModele),
+            InterviewAffich = InterviewDisplay.Importation,
+            Idformulaire = Convert.ToUInt32(0),
+            TypeView = ViewType.VisualisationImport,
+            LibelleFormulaire = Data.NomModele,
+            InputFile = strings,
+            InputFileBlo = stringsblo,
+            InputFileDon = stringsdon,
+            TypeEntretien = Data.RefModele
+        };
+
+        return NextStepId.Default(param);
+
+    }
+
+
+    [Submission]
+    [RestoreData]
+    public NextStepId DoCloseValidation()
+    {
+        return NextStepId.Refresh();
+    }
+
+
+}
