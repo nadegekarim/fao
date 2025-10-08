@@ -1,0 +1,28 @@
+<a:GroupingBlock>
+	
+	<Div>
+		<Strong>Importer des données Génériques pour le modèle : <e:Output Ref="Data/NomModele"/></Strong>
+		<Br/>
+		<e:Label For="uploadModele">Ajouter le fichier des onglets</e:Label>
+		<e:Upload Id="uploadModele" Ref="Data/InputFile"/>
+		<e:InlineMessage For="uploadModele" />
+	</Div>
+	
+	<Br/>
+			<Div>
+				<e:Label For="uploadModeleBlo">Ajouter le fichier des blocs</e:Label>
+				<e:Upload Id="uploadModeleBlo" Ref="Data/InputFileBlo"/>
+				<e:InlineMessage For="uploadModeleBlo"/>
+			</Div>
+	<Br/>
+			<Div>
+				<e:Label For="uploadModeleDon">Ajouter le fichier des données</e:Label>
+				<e:Upload Id="uploadModeleDon" Ref="Data/InputFileDon"/>
+				<e:InlineMessage For="uploadModeleDon"/>
+			</Div>
+	<UpdatePanel Id="Visualisation">
+		<e:ButtonsBlock OrderButtons="True">
+		   <e:CustomButton  Submission="GoVisualisation"> Apercu du modèle avant importation</e:CustomButton>
+		</e:ButtonsBlock>
+	</UpdatePanel>
+</a:GroupingBlock>
