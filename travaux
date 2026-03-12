@@ -1,0 +1,1184 @@
+<Div xmlns="http://e-i.com/devb/webxforms"
+     xmlns:e="http://e-i.com/ergo/v3"
+     xmlns:d="http://e-i.com/devb/devbooster"
+	 xmlns:iwa="http://e-i.com/MITI_MITKIT_IWA"
+     xmlns:my="http://e-i.com/AEN3_TALENT"
+	 xmlns:a="http://e-i.com/ESD1_WALPHA">
+
+	<d:Foreach Nodeset="BlocVM">
+		<d:If ConditionExpr="Visible='O'">
+			<d:If ConditionExpr="Optionnel='N'">
+				<d:Switch TestValueExpr ="type">
+					<d:Case Value="blocsimpleoblig">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+								<Span Class="oblig">*</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<my:GenericChampsSimple/>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocsimple">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsSimpleConsult />
+								<d:If.Else>
+									<my:GenericChampsSimple/>
+								</d:If.Else>
+							</d:If>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocchampsanstable">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<my:GenericChampsValeursSansTable DataContext="{DataBinding ChampsList}"/>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="Champblocchamp">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<my:GenericChampsBlocChamps/>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocobjectif">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+								<d:If ConditionExpr="type ='blocobjComp'">
+									<d:If ConditionExpr="IsAffich='O'">
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<Div Css.BackgroundColor="LemonChiffon">
+												<P>
+													<e:Output Ref="Titre"/>
+													<e:RadioButton Ref="IsVisible"  Value="O" />
+													<e:Label>Oui</e:Label>
+													<e:RadioButton Ref="IsVisible"  Value="N" />
+													<e:Label >Non</e:Label>
+												</P>
+												<!--Champs-->
+												<my:GenericChampsTableauInsertObjectComp />
+											</Div>
+											<d:If.Else>
+												<d:If ConditionExpr ="IsVisible ='O'">
+												<P>
+													<e:Output Ref="Titre"/>>
+												</P>
+													<my:GenericChampsTableauInsertObjectComp />
+												</d:If>
+											</d:If.Else>
+										</d:If>
+										<d:If.Else>
+											<P>
+												<e:Output Ref="Titre"/>
+											</P>
+											<my:GenericChampsTableauInsertObjectComp />
+										</d:If.Else>
+									</d:If>
+								</d:If>
+								<d:If ConditionExpr="type ='blocobjAct'">
+									<d:If ConditionExpr="IsAffich='O'">
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<Div Css.BackgroundColor="LemonChiffon">
+												<P>
+													<e:Output Ref="Titre"/>
+													<e:RadioButton Ref="IsVisible"  Value="O" />
+													<e:Label>Oui</e:Label>
+													<e:RadioButton Ref="IsVisible"  Value="N" />
+													<e:Label>Non</e:Label>
+												</P>
+												<!--Champs-->
+												<my:GenericChampsTableauInsert />
+											</Div>
+											<d:If.Else>
+												<d:If ConditionExpr ="IsVisible ='O'">
+												<P>
+													<e:Output Ref="Titre"/>
+												</P>
+													<my:GenericChampsTableauInsert />
+												</d:If>
+											</d:If.Else>
+										</d:If>
+										<d:If.Else>
+											<P>
+												<e:Output Ref="Titre"/>
+											</P>
+											<my:GenericChampsTableauInsert />
+										</d:If.Else>
+									</d:If>
+								</d:If>
+							</d:Foreach>
+								<!--Champs-->
+								<my:GenericChampsSimple />
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocInsertSansSup">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<my:GenericTabinsertSimple />
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocMobilite">
+						<d:If ConditionExpr="dbtboolean(IsPersonnalise) or dbtboolean(IsApercu)">
+							<e:GroupingInputBlock Css.BackgroundColor="LemonChiffon">
+								<e:GroupingInputBlock.HeaderActionsBlock>
+									<e:ActionsBlock>
+										<e:ActionMenuItem Submission="AddMobilite,  param('codebloc',Id),param('codeonglet',IdOnglet)">
+											Ajouter une mobilité<e:ActionMenuItem.Icon>
+												<e:Icon Type="Add" HasSpacing="False" />
+											</e:ActionMenuItem.Icon>
+										</e:ActionMenuItem>
+									</e:ActionsBlock>
+								</e:GroupingInputBlock.HeaderActionsBlock>
+								<e:GroupingInputBlock.Title>
+									<Span Class="bigger">
+										<e:Output Ref="Titre"/>
+									</Span>
+								</e:GroupingInputBlock.Title>
+								<my:GenericMobilitPersonnalise/>
+							</e:GroupingInputBlock>
+							<d:If.Else>
+								<my:GenericMobilitInterview/>
+							</d:If.Else>
+						</d:If>
+					</d:Case>
+					<d:Case Value="bloccnil">
+						<d:If ConditionExpr ="not(dbtboolean(/Data/IsRealised))">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:Foreach Nodeset="ChampsList/ChampsVM">
+								<d:If ConditionExpr="Type='TX' and Libelle='Cnil'">
+									<e:BlockInfo>
+										<e:UserPrivacyMessage Appearance="Full" LegalContext="FR" />
+									</e:BlockInfo>
+									
+								</d:If>
+							</d:Foreach>
+						</e:GroupingBlock>
+						</d:If>
+					</d:Case>
+					<d:Case Value="blocchampvaleurInfo">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<d:If ConditionExpr ="not(dbtboolean(/Data/IsRealised))">
+								<e:BlockInfo Type="Info">
+									<P>
+										<e:Output Ref="Libelle"/>
+									</P>
+								</e:BlockInfo>
+							</d:If>
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsValeursConsult />
+								<d:If.Else>
+									<my:GenericChampsValeurs />
+								</d:If.Else>
+							</d:If>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocssblocchamp">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+								<!--Champs-->
+								<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+									<my:GenericChampsValeursConsult />
+									<d:If.Else>
+										<my:GenericChampsValeurs />
+									</d:If.Else>
+								</d:If>
+							</d:Foreach>
+							<!--Champs-->
+							<my:GenericChampsSimple/>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocssbloc">
+						<e:GroupingInputBlock>
+							<e:GroupingInputBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingInputBlock.Title>
+							<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+								<e:GroupingBlock>
+									<e:GroupingBlock.Title>
+										<Span Class="bigger">
+											<e:Output Ref="Titre"/>
+										</Span>
+									</e:GroupingBlock.Title>
+									<!--Champs-->
+									<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+										<!--<my:GenericChampsSimpleConsult />-->
+										<my:GenericChampsSimpleConsult />
+										<d:If.Else>
+											<my:GenericChampsSimple/>
+										</d:If.Else>
+									</d:If>
+								</e:GroupingBlock>
+							</d:Foreach>
+						</e:GroupingInputBlock>
+					</d:Case>
+					<d:Case Value="blocssblocTableau">
+						<e:GroupingInputBlock>
+							<e:GroupingInputBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingInputBlock.Title>
+							<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+								<e:GroupingBlock>
+									<e:GroupingBlock.Title>
+										<Span Class="bigger">
+											<e:Output Ref="Titre"/>
+										</Span>
+									</e:GroupingBlock.Title>
+									<!--Champs-->
+									<my:GenericChampsTableauInsert />
+								</e:GroupingBlock>
+							</d:Foreach>
+						</e:GroupingInputBlock>
+					</d:Case>
+					<d:Case Value="blocchamp">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+								<d:If ConditionExpr="Libelle != ''">
+									<e:Hint>
+										<e:Output Ref="Libelle"/>
+									</e:Hint>
+								</d:If>
+							</e:GroupingBlock.Title>
+								<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsValeursConsult />
+								<d:If.Else>
+									<my:GenericChampsValeurs />
+								</d:If.Else>
+							</d:If>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocchamptableau">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsTableauConsult />
+								<d:If.Else>
+									<my:GenericChampsTableau />
+								</d:If.Else>
+							</d:If>
+
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocchamptableausansmacro">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsTableauSansMacroConsult />
+								<d:If.Else>
+									<my:GenericChampsTableauSansMacro />
+								</d:If.Else>
+							</d:If>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocentretien">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<my:blocentretien/>
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocsavoir">
+						<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<P>
+								L'évaluation de l'ensemble des savoirs n'est pas obligatoire. Selectionnez uniquement les compétences sur lesquelles vous souhaitez vous évaluer.
+							</P>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsTableauConsult />
+								<d:If.Else>
+									<my:GenericChampsTableau />
+								</d:If.Else>
+							</d:If>
+
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocsavoirfaire">
+						<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsTableauSansMacroConsult />
+								<d:If.Else>
+									<my:GenericChampsTableauSansMacro />
+								</d:If.Else>
+							</d:If>
+
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocsavoiretre">
+						<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<P>
+								Echelle d'appréciation des savoir-être :<Br />
+								- A développer<Br />
+								- Satisfait aux attentes<Br />
+								- Au-delà des attentes<Br />
+							</P>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsTableauSansMacroConsult />
+								<d:If.Else>
+									<my:GenericChampsTableauSansMacro />
+								</d:If.Else>
+							</d:If>
+
+						</e:GroupingBlock>
+					</d:Case>
+					<d:Case Value="blocchampsbloc">
+						<e:GroupingBlock>
+							<e:GroupingBlock.Title>
+								<Span Class="bigger">
+									<e:Output Ref="Titre"/>
+								</Span>
+							</e:GroupingBlock.Title>
+							<!--Champs-->
+							<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+								<my:GenericChampsValeursConsult />
+								<d:If.Else>
+									<my:GenericChampsValeurs/>
+								</d:If.Else>
+							</d:If>
+							<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+								<d:If ConditionExpr="type = 'blocsimple'">
+									<d:If ConditionExpr="IsAffich='O'">
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<Div Css.BackgroundColor="LemonChiffon">
+												<P>
+														<e:Output Ref="Titre"/>
+													<e:RadioButton Ref="IsVisible"  Value="O" />
+													<e:Label>Oui</e:Label>
+													<e:RadioButton Ref="IsVisible"  Value="N" />
+													<e:Label>Non</e:Label>
+												</P>
+												<!--Champs-->
+												<my:GenericChampsSimple />
+											</Div>
+											<d:If.Else>
+												<d:If ConditionExpr ="IsVisible ='O'">
+													<P>
+															<e:Output Ref="Titre"/>
+													</P>
+													<!--Champs-->
+													<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+														<my:GenericChampsSimpleConsult/>
+														<d:If.Else>
+															<my:GenericChampsSimple />
+														</d:If.Else>
+													</d:If>
+												</d:If>
+											</d:If.Else>
+										</d:If>
+										<d:If.Else>
+											<P>
+													<e:Output Ref="Titre"/>
+											</P>
+											<!--Champs-->
+											<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+												<my:GenericChampsSimpleConsult />
+												<d:If.Else>
+													<my:GenericChampsSimple />
+												</d:If.Else>
+											</d:If>
+										</d:If.Else>
+									</d:If>
+								</d:If>
+								<d:If ConditionExpr="type = 'bloccontenuopt'">
+									<d:If ConditionExpr="IsAffich='O'">
+										<e:GroupingBlock>
+											<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+												<Div Css.BackgroundColor="LemonChiffon">
+													<e:RadioButton Ref="IsVisible"  Value="O" />
+													<e:Label>Oui</e:Label>
+													<e:RadioButton Ref="IsVisible"  Value="N" />
+													<e:Label>Non</e:Label>
+													<DataNodeListener Ref="IsVisible" Submission="RefreshChamps"/>
+													<!--Champs-->
+													<my:GenericChampsValeurs/>
+												</Div>
+												<d:If.Else>
+														<!--Champs-->
+														<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+															<my:GenericChampsValeursConsult/>
+															<d:If.Else>
+																<my:GenericChampsValeurs/>
+															</d:If.Else>
+														</d:If>
+												</d:If.Else>
+												
+											</d:If>
+										</e:GroupingBlock>
+											<d:If.Else>
+												<e:GroupingBlock>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsValeursConsult/>
+													<d:If.Else>
+														<my:GenericChampsValeurs/>
+													</d:If.Else>
+												</d:If>
+												</e:GroupingBlock>
+											</d:If.Else>
+										
+									</d:If>
+								</d:If>
+								<d:If ConditionExpr="type = 'blocchamp'">
+									<d:If ConditionExpr="IsAffich='O'">
+										<e:GroupingBlock>
+											<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+												<Div Css.BackgroundColor="LemonChiffon">
+													<e:RadioButton Ref="IsVisible"  Value="O" />
+													<e:Label>Oui</e:Label>
+													<e:RadioButton Ref="IsVisible"  Value="N" />
+													<e:Label>Non</e:Label>
+													<!--Champs-->
+													<my:GenericChampsValeurs/>
+												</Div>
+												<d:If.Else>
+													<d:If ConditionExpr ="IsVisible ='O'">
+														<!--Champs-->
+														<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+															<my:GenericChampsValeursConsult/>
+															<d:If.Else>
+																<my:GenericChampsValeurs/>
+															</d:If.Else>
+														</d:If>
+													</d:If>
+												</d:If.Else>
+											</d:If>
+										</e:GroupingBlock>
+										<d:If.Else>
+											<e:GroupingBlock>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsValeursConsult/>
+													<d:If.Else>
+														<my:GenericChampsValeurs/>
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If.Else>
+
+									</d:If>
+								</d:If>
+							</d:Foreach>
+						</e:GroupingBlock>
+					</d:Case>
+				</d:Switch>
+
+				<d:If.Else>
+					<d:If ConditionExpr="IsAffich='O'">
+						<d:Switch TestValueExpr ="type">
+							<d:Case Value="bloccertif">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock IsExpandable="True" IsExpanded="False" Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericChampsCert/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock IsExpandable="True" IsExpanded="False">
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+														<my:GenericChampsCert/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="bloccomp">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsTableauInsert2/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericChampsTableauInsert2/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocactivite">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsTableauInsert3/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericChampsTableauInsert3/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocsimple">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsSimple/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsSimpleConsult />
+													<d:If.Else>
+														<my:GenericChampsSimple />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+
+							</d:Case>
+							<d:Case Value="blocInsertsimple">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericTabinsertSimple />
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<my:GenericTabinsertSimple />
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocchamp">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<d:If ConditionExpr="Libelle != ''">
+												<e:Hint>
+													<e:Output Ref="Libelle"/>
+												</e:Hint>
+											</d:If>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+											<my:GenericChampsValeursConsult />
+											<d:If.Else>
+												<my:GenericChampsValeurs />
+											</d:If.Else>
+										</d:If>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+													<d:If ConditionExpr="Libelle != ''">
+														<e:Hint>
+															<e:Output Ref="Libelle"/>
+														</e:Hint>
+													</d:If>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsValeursConsult />
+													<d:If.Else>
+														<my:GenericChampsValeurs />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocchampsanstable">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible" Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsValeursSansTable DataContext="{DataBinding ChampsList}"/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericChampsValeursSansTable DataContext="{DataBinding ChampsList}"/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="Champblocchamp">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label>Non</e:Label>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsBlocChamps/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<my:GenericChampsBlocChamps/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocchampvaleurInfo">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible"  Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<d:If ConditionExpr ="not(dbtboolean(/Data/IsRealised))">
+											<e:BlockInfo Type="Info">
+												<P>
+													<e:Output Ref="Libelle"/>
+												</P>
+											</e:BlockInfo>
+										</d:If>
+										<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+											<my:GenericChampsValeursConsult />
+											<d:If.Else>
+												<my:GenericChampsValeurs />
+											</d:If.Else>
+										</d:If>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<d:If ConditionExpr ="not(dbtboolean(/Data/IsRealised))">
+													<e:BlockInfo Type="Info">
+														<P>
+															<e:Output Ref="Libelle"/>
+														</P>
+													</e:BlockInfo>
+												</d:If>
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsValeursConsult />
+													<d:If.Else>
+														<my:GenericChampsValeurs />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocssblocchamp">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label >Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+											<!--Champs-->
+											<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+												<my:GenericChampsValeursConsult />
+												<d:If.Else>
+													<my:GenericChampsValeurs />
+												</d:If.Else>
+											</d:If>
+										</d:Foreach>
+										<!--Champs-->
+										<my:GenericChampsValeursSansTable DataContext="{DataBinding ChampsList}"/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<d:Foreach Nodeset=" SousBlocsList/BlocVM">
+													<!--Champs-->
+													<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+														<my:GenericChampsValeursConsult />
+														<d:If.Else>
+															<my:GenericChampsValeurs />
+														</d:If.Else>
+													</d:If>
+												</d:Foreach>
+												<!--Champs-->
+												<my:GenericChampsValeursSansTable DataContext="{DataBinding ChampsList}"/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+								
+							</d:Case>
+							<d:Case Value="blocentretien">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<!--Champs-->
+										<my:blocentretien/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:blocentretien/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocsavoir">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon"  IsExpandable="True" IsExpanded="False">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<P>
+											L'évaluation de l'ensemble des savoirs n'est pas obligatoire. Selectionnez uniquement les compétences sur lesquelles vous souhaitez vous évaluer.
+										</P>
+										<!--Champs-->
+										<my:GenericChampsTableau />
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<P>
+													L'évaluation de l'ensemble des savoirs n'est pas obligatoire. Selectionnez uniquement les compétences sur lesquelles vous souhaitez vous évaluer.
+												</P>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsTableauConsult />
+													<d:If.Else>
+														<my:GenericChampsTableau />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocsavoirfaire">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon"  IsExpandable="True" IsExpanded="False">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<!--Champs-->
+										<my:GenericChampsTableauSansMacro />
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsTableauSansMacroConsult />
+													<d:If.Else>
+														<my:GenericChampsTableauSansMacro />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocsavoiretre">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon"  IsExpandable="True" IsExpanded="False">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<P>
+											Echelle d'appréciation des savoir-être :<Br />
+											- A développer<Br />
+											- Satisfait aux attentes<Br />
+											- Au-delà des attentes<Br />
+										</P>
+										<!--Champs-->
+										<my:GenericChampsTableauSansMacro />
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock  IsExpandable="True" IsExpanded="False">
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<P>
+													Echelle d'appréciation des savoir-être :<Br />
+													- A développer<Br />
+													- Satisfait aux attentes<Br />
+													- Au-delà des attentes<Br />
+												</P>
+												<!--Champs-->
+												<d:If ConditionExpr="/Data/TypeAffichage ='CollaboratorConsult' or /Data/TypeAffichage ='ResponsableConsult' or dbtboolean(/Data/IsRealised)">
+													<my:GenericChampsTableauSansMacroConsult />
+													<d:If.Else>
+														<my:GenericChampsTableauSansMacro />
+													</d:If.Else>
+												</d:If>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocInsertSansSup">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+										</e:GroupingBlock.Title>
+										<!--Champs-->
+										<my:GenericTabinsertSimple />
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<e:GroupingBlock IsExpandable="True" IsExpanded="True">
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericTabinsertSimple />
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="blocMobilite">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+										<e:GroupingInputBlock Css.BackgroundColor="LemonChiffon">
+											<e:GroupingInputBlock.HeaderActionsBlock>
+												<e:ActionsBlock>
+													<e:ActionMenuItem Submission="AddMobilite,  param('codebloc',Id),param('codeonglet',IdOnglet)">
+														Ajouter une mobilité<e:ActionMenuItem.Icon>
+															<e:Icon Type="Add" HasSpacing="False" />
+														</e:ActionMenuItem.Icon>
+													</e:ActionMenuItem>
+												</e:ActionsBlock>
+											</e:GroupingInputBlock.HeaderActionsBlock>
+											<e:GroupingInputBlock.Title>
+												<Span Class="bigger">
+													<e:Output Ref="Titre"/>
+												</Span>
+											</e:GroupingInputBlock.Title>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label>Oui</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Non</e:Label>
+									          <my:GenericMobilitPersonnalise/>
+										</e:GroupingInputBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible ='O'">
+											<d:If ConditionExpr="dbtboolean(IsApercu)">
+												<e:GroupingInputBlock>
+													<e:GroupingInputBlock.HeaderActionsBlock>
+														<e:ActionsBlock>
+															<e:ActionMenuItem Submission="AddMobilite,  param('codebloc',Id),param('codeonglet',IdOnglet)">
+																Ajouter une mobilité<e:ActionMenuItem.Icon>
+																	<e:Icon Type="Add" HasSpacing="False" />
+																</e:ActionMenuItem.Icon>
+															</e:ActionMenuItem>
+														</e:ActionsBlock>
+													</e:GroupingInputBlock.HeaderActionsBlock>
+													<e:GroupingInputBlock.Title>
+														<Span Class="bigger">
+															<e:Output Ref="Titre"/>
+														</Span>
+													</e:GroupingInputBlock.Title>
+													<my:GenericMobilitPersonnalise/>
+												</e:GroupingInputBlock>
+												<d:If.Else>
+													<my:GenericMobilitInterview/>
+												</d:If.Else>
+											</d:If>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="bloccontenuopt">
+								<d:If ConditionExpr="dbtboolean(IsPersonnalise)">
+									<e:GroupingBlock Css.BackgroundColor="LemonChiffon">
+										<e:GroupingBlock.Title>
+											<Span Class="bigger">
+												<e:Output Ref="Titre"/>
+											</Span>
+											<e:RadioButton Ref="IsVisible" Value="O" />
+											<e:Label >Sans rénumération</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="N" />
+											<e:Label >Avec rénumération</e:Label>
+											<e:RadioButton Ref="IsVisible"  Value="P" />
+											<e:Label >Non</e:Label>
+											<DataNodeListener Ref="IsVisible" Submission="RefreshChamps"/>
+										</e:GroupingBlock.Title>
+										<my:GenericChampsSimple/>
+									</e:GroupingBlock>
+									<d:If.Else>
+										<d:If ConditionExpr ="IsVisible != 'P'">
+											<e:GroupingBlock>
+												<e:GroupingBlock.Title>
+													<Span Class="bigger">
+														<e:Output Ref="Titre"/>
+													</Span>
+												</e:GroupingBlock.Title>
+												<!--Champs-->
+												<my:GenericChampsSimple/>
+											</e:GroupingBlock>
+										</d:If>
+									</d:If.Else>
+								</d:If>
+
+							</d:Case>
+						</d:Switch>
+					</d:If>
+				</d:If.Else>
+			</d:If>
+
+		</d:If>
+	</d:Foreach>
+</Div>
