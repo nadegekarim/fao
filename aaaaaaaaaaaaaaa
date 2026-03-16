@@ -1,0 +1,1566 @@
+	<d:If ConditionExpr="type ='bloccontenuopt'">
+		<d:If ConditionExpr="IsVisible = 'O'">
+			<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+				<e:Colgroup Aria.Role="presentation">
+					<e:Col Css.Width="30%" />
+					<e:Col Css.Width="70%" />
+				</e:Colgroup>
+				<d:Foreach Nodeset="ChampsList/ChampsVM">
+					<d:If ConditionExpr="dbtboolean(../../IsPersonnalise) or dbtboolean(../../IsApercu)">
+						<d:If ConditionExpr="Libelle2 != ''">
+							<e:Tr>
+								<e:Td Class="ei-saisie__th" Colspan="2">
+									<e:Output Ref="Libelle2"/>
+								</e:Td>
+							</e:Tr>
+						</d:If>
+						<e:Tr>
+							<e:Td Class="ei-saisie__th">
+								<d:If ConditionExpr="AffichCol != 'N'">
+									<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+										<e:Output Ref="LibRecap"/>
+										<d:If.Else>
+											<e:Output Ref="Libelle"/>
+										</d:If.Else>
+									</d:If>
+									<d:If ConditionExpr="Oblig='O'">
+										<Span Class="oblig">*</Span>
+									</d:If>
+								</d:If>
+							</e:Td>
+							<e:Td>
+								<my:GenericTypeChamps/>
+							</e:Td>
+						</e:Tr>
+						<d:If.Else>
+							<d:Switch TestValueExpr ="Auteur">
+								<d:Case Value="B">
+									<d:If ConditionExpr="Libelle2 != ''">
+										<e:Tr>
+											<e:Td Class="ei-saisie__th" Colspan="2">
+												<e:Output Ref="Libelle2"/>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+									<e:Tr>
+										<e:Td Class="ei-saisie__th">
+											<d:If ConditionExpr="AffichCol != 'N'">
+												<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+													<e:Output Ref="LibRecap"/>
+													<d:If.Else>
+														<e:Output Ref="Libelle"/>
+													</d:If.Else>
+												</d:If>
+												<d:If ConditionExpr="Oblig='O'">
+													<Span Class="oblig">*</Span>
+												</d:If>
+											</d:If>
+										</e:Td>
+										<e:Td>
+											<my:GenericTypeChamps/>
+										</e:Td>
+									</e:Tr>
+								</d:Case>
+								<d:Case Value="C">
+									<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+										<d:If ConditionExpr="Libelle2 != ''">
+												<e:Tr>
+													<e:Td Class="ei-saisie__th" Colspan="2">
+														<e:Output Ref="Libelle2"/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+										<e:Tr>
+												<e:Td Class="ei-saisie__th">
+													<d:If ConditionExpr="AffichCol != 'N'">
+														<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+															<e:Output Ref="LibRecap"/>
+															<d:If.Else>
+																<e:Output Ref="Libelle"/>
+															</d:If.Else>
+														</d:If>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</d:If>
+												</e:Td>
+												<e:Td>
+													<my:GenericTypeChamps/>
+												</e:Td>
+											</e:Tr>
+										<d:If.Else>
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChampsOutput/>
+													</e:Td>
+												</e:Tr>
+										</d:If.Else>
+									</d:If>
+								</d:Case>
+								<d:Case Value="M">
+									<d:If ConditionExpr="/Data/TypeAffichage != 'Collaborateur'">
+										<d:If ConditionExpr="Libelle2 != ''">
+											<e:Tr>
+												<e:Td Class="ei-saisie__th" Colspan="2">
+													<e:Output Ref="Libelle2"/>
+												</e:Td>
+											</e:Tr>
+										</d:If>
+										<e:Tr>
+											<e:Td Class="ei-saisie__th">
+												<d:If ConditionExpr="AffichCol != 'N'">
+													<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+														<e:Output Ref="LibRecap"/>
+														<d:If.Else>
+															<e:Output Ref="Libelle"/>
+														</d:If.Else>
+													</d:If>
+													<d:If ConditionExpr="Oblig='O'">
+														<Span Class="oblig">*</Span>
+													</d:If>
+												</d:If>
+											</e:Td>
+											<e:Td>
+												<my:GenericTypeChamps/>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+								</d:Case>
+							</d:Switch>
+						</d:If.Else>
+					</d:If>
+				</d:Foreach>
+			</e:Table>
+
+
+			<d:If.Else>
+				<d:If ConditionExpr="IsVisible = 'N'">
+					<P>
+						<e:Output Ref="Libelle"/>
+					</P>
+
+					<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+						<e:Colgroup Aria.Role="presentation">
+							<e:Col Css.Width="30%" />
+							<e:Col Css.Width="70%" />
+						</e:Colgroup>
+						<d:Foreach Nodeset="ChampsList/ChampsVM">
+							<d:If ConditionExpr="dbtboolean(../../IsPersonnalise) or dbtboolean(../../IsApercu)">
+								<d:If ConditionExpr="AffichCol != 'N'">
+									<d:If ConditionExpr="Libelle2 != ''">
+										<e:Tr>
+											<e:Td Class="ei-saisie__th" Colspan="2">
+												<e:Output Ref="Libelle2"/>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+									<e:Tr>
+										<e:Td Class="ei-saisie__th">
+											<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+												<e:Output Ref="LibRecap"/>
+												<d:If.Else>
+													<e:Output Ref="Libelle"/>
+												</d:If.Else>
+											</d:If>
+											<d:If ConditionExpr="Oblig='O'">
+												<Span Class="oblig">*</Span>
+											</d:If>
+										</e:Td>
+										<e:Td>
+											<my:GenericTypeChamps/>
+										</e:Td>
+									</e:Tr>
+								</d:If>
+								<d:If.Else>
+									<d:Switch TestValueExpr ="Auteur">
+										<d:Case Value="B">
+											<d:If ConditionExpr="Libelle2 != ''">
+												<e:Tr>
+													<e:Td Class="ei-saisie__th" Colspan="2">
+														<e:Output Ref="Libelle2"/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<e:Tr>
+												<e:Td Class="ei-saisie__th">
+													<d:If ConditionExpr="AffichCol != 'N'">
+														<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+															<e:Output Ref="LibRecap"/>
+															<d:If.Else>
+																<e:Output Ref="Libelle"/>
+															</d:If.Else>
+														</d:If>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</d:If>
+												</e:Td>
+												<e:Td>
+													<my:GenericTypeChamps/>
+												</e:Td>
+											</e:Tr>
+										</d:Case>
+										<d:Case Value="C">
+											<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+												<d:If.Else>
+													<d:If ConditionExpr="Libelle2 != ''">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<e:Output Ref="Libelle2"/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<d:If ConditionExpr="AffichCol != 'N'">
+																<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																	<e:Output Ref="LibRecap"/>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle"/>
+																	</d:If.Else>
+																</d:If>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<my:GenericTypeChampsOutput/>
+														</e:Td>
+													</e:Tr>
+												</d:If.Else>
+											</d:If>
+										</d:Case>
+										<d:Case Value="M">
+											<d:If ConditionExpr="/Data/TypeAffichage != 'Collaborateur'">
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+										</d:Case>
+									</d:Switch>
+
+								</d:If.Else>
+							</d:If>
+						</d:Foreach>
+					</e:Table>
+
+
+				</d:If>
+			</d:If.Else>
+		</d:If>
+		<d:If.Else>
+
+			<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+				<e:Colgroup Aria.Role="presentation">
+					<e:Col Css.Width="30%" />
+					<e:Col Css.Width="70%" />
+				</e:Colgroup>
+				<d:Foreach Nodeset="ChampsList/ChampsVM">
+					<d:If ConditionExpr="Option='N'">
+						<d:Switch TestValueExpr ="Auteur">
+							<d:Case Value="B">
+								<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+									<e:Tr>
+										<e:Td Class="ei-saisie__th" Colspan="2">
+											<d:If ConditionExpr="Type_Cpl ='INFO'">
+												<Strong>
+													<e:Output Ref="Libelle2"/>
+												</Strong>
+												<d:If.Else>
+													<e:Output Ref="Libelle2"/>
+													<d:If ConditionExpr="Oblig='O'">
+														<Span Class="oblig">*</Span>
+													</d:If>
+												</d:If.Else>
+											</d:If>
+										</e:Td>
+									</e:Tr>
+								</d:If>
+								<e:Tr>
+									<e:Td Class="ei-saisie__th">
+										<d:If ConditionExpr="AffichCol != 'N'">
+											<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+												<e:Output Ref="LibRecap"/>
+												<d:If.Else>
+													<e:Output Ref="Libelle"/>
+												</d:If.Else>
+											</d:If>
+											<d:If ConditionExpr="Oblig='O'">
+												<Span Class="oblig">*</Span>
+											</d:If>
+											<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+												<e:Hint Type="Information">
+													<e:Output Ref="Libelle2"/>
+												</e:Hint>
+											</d:If>
+										</d:If>
+									</e:Td>
+									<e:Td>
+										<my:GenericTypeChamps/>
+									</e:Td>
+								</e:Tr>
+								<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non')">
+									<d:Foreach Nodeset="SousChamps/ChampsVM">
+										<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+											<d:If ConditionExpr="Auteur='C'">
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<e:Output Ref="Libelle"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<d:If ConditionExpr="dbtboolean(../../../../IsPersonnalise) or dbtboolean(../../../../IsApercu)">
+												<d:If ConditionExpr="Auteur='M'">
+													<d:If ConditionExpr="Libelle2 != ''">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<e:Output Ref="Libelle2"/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<e:Output Ref="Libelle"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<my:GenericTypeChamps/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+											</d:If>
+											<d:If.Else>
+												<d:If ConditionExpr="Auteur='C'">
+													<d:If ConditionExpr="Libelle2 != ''">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<e:Output Ref="Libelle2"/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<e:Output Ref="Libelle"/>
+														</e:Td>
+														<e:Td>
+															<d:If ConditionExpr="dbtboolean(../../../../IsPersonnalise) or dbtboolean(../../../../IsApercu)">
+																<my:GenericTypeChamps/>
+																<d:If.Else>
+																	<my:GenericTypeChampsOutput/>
+																</d:If.Else>
+															</d:If>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+											</d:If.Else>
+										</d:If>
+										<d:If ConditionExpr="/Data/TypeAffichage !='Collaborateur'">
+											<d:If ConditionExpr="Auteur='M'">
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<e:Output Ref="Libelle"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+										</d:If>
+									</d:Foreach>
+								</d:If>
+							</d:Case>
+							<d:Case Value="C">
+								<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+									<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+										<e:Tr>
+											<e:Td Class="ei-saisie__th" Colspan="2">
+												<d:If ConditionExpr="Type_Cpl ='INFO'">
+													<Strong>
+														<e:Output Ref="Libelle2"/>
+													</Strong>
+													<d:If.Else>
+														<e:Output Ref="Libelle2"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</d:If.Else>
+												</d:If>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+									<e:Tr>
+										<e:Td Class="ei-saisie__th">
+											<d:If ConditionExpr="AffichCol != 'N'">
+												<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+													<e:Output Ref="LibRecap"/>
+													<d:If.Else>
+														<e:Output Ref="Libelle"/>
+													</d:If.Else>
+												</d:If>
+												<d:If ConditionExpr="Oblig='O'">
+													<Span Class="oblig">*</Span>
+												</d:If>
+												<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+													<e:Hint Type="Information">
+														<e:Output Ref="Libelle2"/>
+													</e:Hint>
+												</d:If>
+											</d:If>
+										</e:Td>
+										<e:Td>
+											<my:GenericTypeChamps/>
+										</e:Td>
+									</e:Tr>
+										<d:If ConditionExpr="(Type_Cpl='SOUHAIT' and valeur ='Oui')">
+											<d:Foreach Nodeset="SousChamps/ChampsVM">
+												<e:Tr>
+													<e:Td>
+													</e:Td>
+													<e:Td>
+														<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+															<e:Colgroup Aria.Role="presentation">
+																<e:Col Css.Width="10%" />
+																<e:Col/>
+															</e:Colgroup>
+															<e:Tr>
+																<e:Td>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																	<e:Label >
+																		<e:Output Ref="Libelle"/>
+																	</e:Label>
+																</e:Td>
+																<e:Td>
+																	<my:GenericTypeChamps/>
+																</e:Td>
+															</e:Tr>
+														</e:Table>
+													</e:Td>
+												</e:Tr>
+											</d:Foreach>
+										</d:If>
+										<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+											<d:Foreach Nodeset="SousChamps/ChampsVM">
+												<d:If ConditionExpr="Libelle2 != ''">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<e:Output Ref="Libelle2"/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<e:Output Ref="Libelle"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+											</d:Foreach>
+										</d:If>
+									<d:If.Else>
+										<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+											<e:Tr>
+												<e:Td Class="ei-saisie__th" Colspan="2">
+													<d:If ConditionExpr="Type_Cpl ='INFO'">
+														<Strong>
+															<e:Output Ref="Libelle2"/>
+														</Strong>
+														<d:If.Else>
+															<e:Output Ref="Libelle2"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If.Else>
+													</d:If>
+												</e:Td>
+											</e:Tr>
+										</d:If>
+										<e:Tr>
+											<e:Td Class="ei-saisie__th">
+												<d:If ConditionExpr="AffichCol != 'N'">
+													<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+														<e:Output Ref="LibRecap"/>
+														<d:If.Else>
+															<e:Output Ref="Libelle"/>
+														</d:If.Else>
+													</d:If>
+													<d:If ConditionExpr="Oblig='O'">
+														<Span Class="oblig">*</Span>
+													</d:If>
+													<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+														<e:Hint Type="Information">
+															<e:Output Ref="Libelle2"/>
+														</e:Hint>
+													</d:If>
+												</d:If>
+											</e:Td>
+											<e:Td>
+													<d:If ConditionExpr="dbtboolean(../../IsPersonnalise) or dbtboolean(../../IsApercu)">
+														<my:GenericTypeChamps/>
+														<d:If.Else>
+															<my:GenericTypeChampsOutput/>
+														</d:If.Else>
+													</d:If>
+												</e:Td>
+											</e:Tr>
+											<d:If ConditionExpr="Type_Cpl='SOUHAIT' and valeur ='Oui'">
+												<d:Foreach Nodeset="SousChamps/ChampsVM">
+													<e:Tr>
+														<e:Td>
+														</e:Td>
+														<e:Td>
+															<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+																<e:Colgroup Aria.Role="presentation">
+																	<e:Col Css.Width="10%" />
+																	<e:Col/>
+																</e:Colgroup>
+																<e:Tr>
+																	<e:Td>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																		<e:Label >
+																			<e:Output Ref="Libelle"/>
+																		</e:Label>
+																	</e:Td>
+																	<e:Td>
+																		<d:If ConditionExpr="dbtboolean(../../../../IsPersonnalise) or dbtboolean(../../../../IsApercu)">
+																			<my:GenericTypeChamps/>
+																			<d:If.Else>
+																				<my:GenericTypeChampsOutput/>
+																			</d:If.Else>
+																		</d:If>
+																	</e:Td>
+																</e:Tr>
+															</e:Table>
+														</e:Td>
+													</e:Tr>
+												</d:Foreach>
+											</d:If>
+										<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+												<d:Foreach Nodeset="SousChamps/ChampsVM">
+													<d:If ConditionExpr="Libelle2 != ''">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<e:Output Ref="Libelle2"/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<e:Output Ref="Libelle"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<d:If ConditionExpr="dbtboolean(../../../../IsPersonnalise) or dbtboolean(../../../../IsApercu)">
+																<my:GenericTypeChamps/>
+																<d:If.Else>
+																	<my:GenericTypeChampsOutput/>
+																</d:If.Else>
+															</d:If>
+														</e:Td>
+													</e:Tr>
+												</d:Foreach>
+											</d:If>
+									</d:If.Else>
+								</d:If>
+							</d:Case>
+							<d:Case Value="M">
+								<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+									<d:If ConditionExpr="Type='CX'">
+										<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+											<e:Tr>
+												<e:Td Class="ei-saisie__th" Colspan="2">
+													<d:If ConditionExpr="Type_Cpl ='INFO'">
+														<Strong>
+															<e:Output Ref="Libelle2"/>
+														</Strong>
+														<d:If.Else>
+															<e:Output Ref="Libelle2"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If.Else>
+													</d:If>
+												</e:Td>
+											</e:Tr>
+										</d:If>
+										<e:Tr>
+											<e:Td Class="ei-saisie__th">
+												<d:If ConditionExpr="AffichCol != 'N'">
+													<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+														<e:Output Ref="LibRecap"/>
+														<d:If.Else>
+															<e:Output Ref="Libelle"/>
+														</d:If.Else>
+													</d:If>
+													<d:If ConditionExpr="Oblig='O'">
+														<Span Class="oblig">*</Span>
+													</d:If>
+													<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+														<e:Hint Type="Information">
+															<e:Output Ref="Libelle2"/>
+														</e:Hint>
+													</d:If>
+												</d:If>
+											</e:Td>
+											<e:Td>
+												<my:GenericTypeChamps/>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+									<d:If ConditionExpr="dbtboolean(../../IsPersonnalise) or dbtboolean(../../IsApercu)">
+										<d:If ConditionExpr="Type='TX'">
+											<d:If ConditionExpr="Libelle2 != ''">
+												<e:Tr>
+													<e:Td Class="ei-saisie__th" Colspan="2">
+														<e:Output Ref="Libelle2"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<e:Tr>
+												<e:Td Class="ei-saisie__th">
+													<d:If ConditionExpr="AffichCol != 'N'">
+														<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+															<e:Output Ref="LibRecap"/>
+															<d:If.Else>
+																<e:Output Ref="Libelle"/>
+															</d:If.Else>
+														</d:If>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</d:If>
+												</e:Td>
+												<e:Td>
+													<my:GenericTypeChamps/>
+												</e:Td>
+
+											</e:Tr>
+										</d:If>
+									</d:If>
+								</d:If>
+								<d:If ConditionExpr="/Data/TypeAffichage != 'Collaborateur'">
+									<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+										<e:Tr>
+											<e:Td Class="ei-saisie__th" Colspan="2">
+												<d:If ConditionExpr="Type_Cpl ='INFO'">
+													<Strong>
+														<e:Output Ref="Libelle2"/>
+													</Strong>
+													<d:If.Else>
+														<e:Output Ref="Libelle2"/>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+													</d:If.Else>
+												</d:If>
+											</e:Td>
+										</e:Tr>
+									</d:If>
+									<e:Tr>
+										<e:Td Class="ei-saisie__th">
+											<d:If ConditionExpr="AffichCol != 'N'">
+												<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+													<e:Output Ref="LibRecap"/>
+													<d:If.Else>
+														<e:Output Ref="Libelle"/>
+													</d:If.Else>
+												</d:If>
+												<d:If ConditionExpr="Oblig='O'">
+													<Span Class="oblig">*</Span>
+												</d:If>
+												<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+													<e:Hint Type="Information">
+														<e:Output Ref="Libelle2"/>
+													</e:Hint>
+												</d:If>
+											</d:If>
+										</e:Td>
+											<e:Td>
+												<my:GenericTypeChamps/>
+											</e:Td>
+										</e:Tr>
+								</d:If>
+							</d:Case>
+						</d:Switch>
+						<d:If.Else>
+							<d:Switch TestValueExpr ="Auteur">
+								<d:Case Value="B">
+									<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+										<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+											<e:Tr>
+												<e:Td Class="ei-saisie__th" Colspan="2">
+													<d:If ConditionExpr="Type_Cpl ='INFO'">
+														<Strong>
+															<e:Output Ref="Libelle2"/>
+														</Strong>
+														<d:If.Else>
+															<e:Output Ref="Libelle2"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</d:If.Else>
+													</d:If>
+												</e:Td>
+											</e:Tr>
+										</d:If>
+										<e:Tr>
+											<e:Td Class="ei-saisie__th">
+												<d:If ConditionExpr="AffichCol != 'N'">
+													<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+														<e:Output Ref="LibRecap"/>
+														<d:If.Else>
+															<e:Output Ref="Libelle"/>
+														</d:If.Else>
+													</d:If>
+													<d:If ConditionExpr="Oblig='O'">
+														<Span Class="oblig">*</Span>
+													</d:If>
+													<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+														<e:Hint Type="Information">
+															<e:Output Ref="Libelle2"/>
+														</e:Hint>
+													</d:If>
+												</d:If>
+											</e:Td>
+											<e:Td>
+												<my:GenericPersonnalise />
+											</e:Td>
+										</e:Tr>
+										<d:If.Else>
+											<d:If ConditionExpr ="IsVisible ='O'">
+												<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<d:If ConditionExpr="Type_Cpl ='INFO'">
+																<Strong>
+																	<e:Output Ref="Libelle2"/>
+																</Strong>
+																<d:If.Else>
+																	<e:Output Ref="Libelle2"/>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																</d:If.Else>
+															</d:If>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+															<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																<e:Hint Type="Information">
+																	<e:Output Ref="Libelle2"/>
+																</e:Hint>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericTypeChamps/>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+										</d:If.Else>
+									</d:If>
+								</d:Case>
+								<d:Case Value="C">
+									<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+												<e:Tr>
+													<e:Td Class="ei-saisie__th" Colspan="2">
+														<d:If ConditionExpr="Type_Cpl ='INFO'">
+															<Strong>
+																<e:Output Ref="Libelle2"/>
+															</Strong>
+															<d:If.Else>
+																<e:Output Ref="Libelle2"/>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+															</d:If.Else>
+														</d:If>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<e:Tr>
+												<e:Td Class="ei-saisie__th">
+													<d:If ConditionExpr="AffichCol != 'N'">
+														<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+															<e:Output Ref="LibRecap"/>
+															<d:If.Else>
+																<e:Output Ref="Libelle"/>
+															</d:If.Else>
+														</d:If>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+														<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+															<e:Hint Type="Information">
+																<e:Output Ref="Libelle2"/>
+															</e:Hint>
+														</d:If>
+													</d:If>
+												</e:Td>
+												<e:Td>
+													<my:GenericPersonnalise />
+												</e:Td>
+											</e:Tr>
+											<d:If ConditionExpr="Type_Cpl='SOUHAIT' and valeur ='Oui'">
+												<d:Foreach Nodeset="SousChamps/ChampsVM">
+													<e:Tr>
+														<e:Td>
+														</e:Td>
+														<e:Td>
+															<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+																<e:Colgroup Aria.Role="presentation">
+																	<e:Col Css.Width="10%" />
+																	<e:Col/>
+																</e:Colgroup>
+																<e:Tr>
+																	<e:Td>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																		<e:Label >
+																			<e:Output Ref="Libelle"/>
+																		</e:Label>
+																	</e:Td>
+																	<e:Td>
+																		<Div Css.BackgroundColor="LemonChiffon">
+																			<my:GenericTypeChamps/>
+																		</Div>
+																	</e:Td>
+																</e:Tr>
+															</e:Table>
+														</e:Td>
+													</e:Tr>
+												</d:Foreach>
+											</d:If>
+											<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+												<d:Foreach Nodeset="SousChamps/ChampsVM">
+													<d:If ConditionExpr="Libelle2 != ''">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<e:Output Ref="Libelle2"/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<e:Output Ref="Libelle"/>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<Div Css.BackgroundColor="LemonChiffon">
+																<my:GenericTypeChamps/>
+															</Div>
+														</e:Td>
+													</e:Tr>
+												</d:Foreach>
+											</d:If>
+											<d:If.Else>
+												<d:If ConditionExpr ="IsVisible ='O'">
+													<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<d:If ConditionExpr="Type_Cpl ='INFO'">
+																	<Strong>
+																		<e:Output Ref="Libelle2"/>
+																	</Strong>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle2"/>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																	</d:If.Else>
+																</d:If>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<d:If ConditionExpr="AffichCol != 'N'">
+																<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																	<e:Output Ref="LibRecap"/>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle"/>
+																	</d:If.Else>
+																</d:If>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+																<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																	<e:Hint Type="Information">
+																		<e:Output Ref="Libelle2"/>
+																	</e:Hint>
+																</d:If>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<my:GenericTypeChamps/>
+														</e:Td>
+
+													</e:Tr>
+													<d:If ConditionExpr="Type_Cpl='SOUHAIT' and valeur ='Oui'">
+														<d:Foreach Nodeset="SousChamps/ChampsVM">
+															<e:Tr>
+																<e:Td>
+																</e:Td>
+																<e:Td>
+																	<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+																		<e:Colgroup Aria.Role="presentation">
+																			<e:Col Css.Width="10%" />
+																			<e:Col/>
+																		</e:Colgroup>
+																		<e:Tr>
+																			<e:Td>
+																				<d:If ConditionExpr="Oblig='O'">
+																					<Span Class="oblig">*</Span>
+																				</d:If>
+																				<e:Label >
+																					<e:Output Ref="Libelle"/>
+																				</e:Label>
+																			</e:Td>
+																			<e:Td>
+																				<my:GenericTypeChamps/>
+																			</e:Td>
+																		</e:Tr>
+																	</e:Table>
+																</e:Td>
+															</e:Tr>
+														</d:Foreach>
+													</d:If>
+													<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+														<d:Foreach Nodeset="SousChamps/ChampsVM">
+															<d:If ConditionExpr="Libelle2 != ''">
+																<e:Tr>
+																	<e:Td Class="ei-saisie__th" Colspan="2">
+																		<e:Output Ref="Libelle2"/>
+																	</e:Td>
+																</e:Tr>
+															</d:If>
+															<e:Tr>
+																<e:Td Class="ei-saisie__th">
+																	<e:Output Ref="Libelle"/>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																</e:Td>
+																<e:Td>
+																	<my:GenericTypeChamps/>
+																</e:Td>
+															</e:Tr>
+														</d:Foreach>
+													</d:If>
+												</d:If>
+											</d:If.Else>
+
+										</d:If>
+										<d:If.Else>
+											<d:If ConditionExpr="Auteur='C'">
+												<d:If ConditionExpr ="dbtboolean(../../IsPersonnalise)">
+													<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<d:If ConditionExpr="Type_Cpl ='INFO'">
+																	<Strong>
+																		<e:Output Ref="Libelle2"/>
+																	</Strong>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle2"/>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																	</d:If.Else>
+																</d:If>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<d:If ConditionExpr="AffichCol != 'N'">
+																<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																	<e:Output Ref="LibRecap"/>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle"/>
+																	</d:If.Else>
+																</d:If>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+																<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																	<e:Hint Type="Information">
+																		<e:Output Ref="Libelle2"/>
+																	</e:Hint>
+																</d:If>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<my:GenericPersonnalise />
+														</e:Td>
+													</e:Tr>
+													<d:If ConditionExpr="Type_Cpl='SOUHAIT' and valeur ='Oui'">
+														<d:Foreach Nodeset="SousChamps/ChampsVM">
+															<e:Tr>
+																<e:Td>
+																</e:Td>
+																<e:Td>
+																	<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+																		<e:Colgroup Aria.Role="presentation">
+																			<e:Col Css.Width="10%" />
+																			<e:Col/>
+																		</e:Colgroup>
+																		<e:Tr>
+																			<e:Td>
+																				<d:If ConditionExpr="Oblig='O'">
+																					<Span Class="oblig">*</Span>
+																				</d:If>
+																				<e:Label >
+																					<e:Output Ref="Libelle"/>
+																				</e:Label>
+																			</e:Td>
+																			<e:Td>
+																				<Div Css.BackgroundColor="LemonChiffon">
+																					<my:GenericTypeChamps/>
+																				</Div>
+																			</e:Td>
+																		</e:Tr>
+																	</e:Table>
+																</e:Td>
+															</e:Tr>
+														</d:Foreach>
+													</d:If>
+													<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+														<d:Foreach Nodeset="SousChamps/ChampsVM">
+															<d:If ConditionExpr="Libelle2 != ''">
+																<e:Tr>
+																	<e:Td Class="ei-saisie__th" Colspan="2">
+																		<e:Output Ref="Libelle2"/>
+																	</e:Td>
+																</e:Tr>
+															</d:If>
+															<e:Tr>
+																<e:Td Class="ei-saisie__th">
+																	<e:Output Ref="Libelle"/>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																</e:Td>
+																<e:Td>
+																	<Div Css.BackgroundColor="LemonChiffon">
+																		<my:GenericTypeChamps/>
+																	</Div>
+																</e:Td>
+															</e:Tr>
+														</d:Foreach>
+													</d:If>
+													<d:If.Else>
+														<d:If ConditionExpr="IsVisible ='O'">
+															<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+																<e:Tr>
+																	<e:Td Class="ei-saisie__th" Colspan="2">
+																		<d:If ConditionExpr="Type_Cpl ='INFO'">
+																			<Strong>
+																				<e:Output Ref="Libelle2"/>
+																			</Strong>
+																			<d:If.Else>
+																				<e:Output Ref="Libelle2"/>
+																				<d:If ConditionExpr="Oblig='O'">
+																					<Span Class="oblig">*</Span>
+																				</d:If>
+																			</d:If.Else>
+																		</d:If>
+																	</e:Td>
+																</e:Tr>
+															</d:If>
+															<e:Tr>
+																<e:Td Class="ei-saisie__th">
+																	<d:If ConditionExpr="AffichCol != 'N'">
+																		<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																			<e:Output Ref="LibRecap"/>
+																			<d:If.Else>
+																				<e:Output Ref="Libelle"/>
+																			</d:If.Else>
+																		</d:If>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																		<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																			<e:Hint Type="Information">
+																				<e:Output Ref="Libelle2"/>
+																			</e:Hint>
+																		</d:If>
+																	</d:If>
+																</e:Td>
+																<e:Td>
+																	<d:If ConditionExpr="dbtboolean(../../IsApercu)">
+																		<my:GenericTypeChamps/>
+																		<d:If.Else>
+																			<my:GenericTypeChampsOutput/>
+																		</d:If.Else>
+																	</d:If>
+																</e:Td>
+															</e:Tr>
+															<d:If ConditionExpr="Type_Cpl='SOUHAIT' and valeur ='Oui'">
+																<d:Foreach Nodeset="SousChamps/ChampsVM">
+																	<e:Tr>
+																		<e:Td>
+																		</e:Td>
+																		<e:Td>
+																			<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+																				<e:Colgroup Aria.Role="presentation">
+																					<e:Col Css.Width="10%" />
+																					<e:Col/>
+																				</e:Colgroup>
+																				<e:Tr>
+																					<e:Td>
+																						<d:If ConditionExpr="Oblig='O'">
+																							<Span Class="oblig">*</Span>
+																						</d:If>
+																						<e:Label >
+																							<e:Output Ref="Libelle"/>
+																						</e:Label>
+																					</e:Td>
+																					<e:Td>
+																						<d:If ConditionExpr="dbtboolean(../../IsApercu)">
+																							<my:GenericTypeChamps/>
+																							<d:If.Else>
+																								<my:GenericTypeChampsOutput/>
+																							</d:If.Else>
+																						</d:If>
+																					</e:Td>
+																				</e:Tr>
+																			</e:Table>
+																		</e:Td>
+																	</e:Tr>
+																</d:Foreach>
+															</d:If>
+															<d:If ConditionExpr="(Type_Cpl='O' and valeur ='Oui') or (Type_Cpl='TYPENT' and valeur ='Oui') or (Type_Cpl='N' and valeur ='Non') ">
+																<d:Foreach Nodeset="SousChamps/ChampsVM">
+																	<d:If ConditionExpr="Libelle2 != ''">
+																		<e:Tr>
+																			<e:Td Class="ei-saisie__th" Colspan="2">
+																				<e:Output Ref="Libelle2"/>
+																			</e:Td>
+																		</e:Tr>
+																	</d:If>
+																	<e:Tr>
+																		<e:Td Class="ei-saisie__th">
+																			<e:Output Ref="Libelle"/>
+																			<d:If ConditionExpr="Oblig='O'">
+																				<Span Class="oblig">*</Span>
+																			</d:If>
+																		</e:Td>
+																		<e:Td>
+																			<d:If ConditionExpr="dbtboolean(../../IsApercu)">
+																				<my:GenericTypeChamps/>
+																				<d:If.Else>
+																					<my:GenericTypeChampsOutput/>
+																				</d:If.Else>
+																			</d:If>
+																		</e:Td>
+																	</e:Tr>
+																</d:Foreach>
+															</d:If>
+														</d:If>
+													</d:If.Else>
+												</d:If>
+											</d:If>
+										</d:If.Else>
+									</d:If>
+								</d:Case>
+								<d:Case Value="M">
+									<d:If ConditionExpr="/Data/TypeAffichage ='Collaborateur'">
+										<d:If ConditionExpr="Type='CX'">
+											<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+												<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<d:If ConditionExpr="Type_Cpl ='INFO'">
+																<Strong>
+																	<e:Output Ref="Libelle2"/>
+																</Strong>
+																<d:If.Else>
+																	<e:Output Ref="Libelle2"/>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																</d:If.Else>
+															</d:If>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+															<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																<e:Hint Type="Information">
+																	<e:Output Ref="Libelle2"/>
+																</e:Hint>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericPersonnalise />
+													</e:Td>
+												</e:Tr>
+												<d:If.Else>
+													<d:If ConditionExpr ="IsVisible ='O'">
+														<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+															<e:Tr>
+																<e:Td Class="ei-saisie__th" Colspan="2">
+																	<d:If ConditionExpr="Type_Cpl ='INFO'">
+																		<Strong>
+																			<e:Output Ref="Libelle2"/>
+																		</Strong>
+																		<d:If.Else>
+																			<e:Output Ref="Libelle2"/>
+																			<d:If ConditionExpr="Oblig='O'">
+																				<Span Class="oblig">*</Span>
+																			</d:If>
+																		</d:If.Else>
+																	</d:If>
+																</e:Td>
+															</e:Tr>
+														</d:If>
+														<e:Tr>
+															<e:Td Class="ei-saisie__th">
+																<d:If ConditionExpr="AffichCol != 'N'">
+																	<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																		<e:Output Ref="LibRecap"/>
+																		<d:If.Else>
+																			<e:Output Ref="Libelle"/>
+																		</d:If.Else>
+																	</d:If>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																	<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																		<e:Hint Type="Information">
+																			<e:Output Ref="Libelle2"/>
+																		</e:Hint>
+																	</d:If>
+																</d:If>
+															</e:Td>
+															<e:Td>
+																<my:GenericTypeChamps/>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+												</d:If.Else>
+											</d:If>
+										</d:If>
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<d:If ConditionExpr="Type='TX'">
+												<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+													<e:Tr>
+														<e:Td Class="ei-saisie__th" Colspan="2">
+															<d:If ConditionExpr="Type_Cpl ='INFO'">
+																<Strong>
+																	<e:Output Ref="Libelle2"/>
+																</Strong>
+																<d:If.Else>
+																	<e:Output Ref="Libelle2"/>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																</d:If.Else>
+															</d:If>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+												<e:Tr>
+													<e:Td Class="ei-saisie__th">
+														<d:If ConditionExpr="AffichCol != 'N'">
+															<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																<e:Output Ref="LibRecap"/>
+																<d:If.Else>
+																	<e:Output Ref="Libelle"/>
+																</d:If.Else>
+															</d:If>
+															<d:If ConditionExpr="Oblig='O'">
+																<Span Class="oblig">*</Span>
+															</d:If>
+															<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																<e:Hint Type="Information">
+																	<e:Output Ref="Libelle2"/>
+																</e:Hint>
+															</d:If>
+														</d:If>
+													</e:Td>
+													<e:Td>
+														<my:GenericPersonnalise />
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<d:If.Else>
+												<d:If ConditionExpr="IsVisible ='O'  and dbtboolean(../../IsApercu)">
+													<d:If ConditionExpr="Type='TX'">
+														<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+															<e:Tr>
+																<e:Td Class="ei-saisie__th" Colspan="2">
+																	<d:If ConditionExpr="Type_Cpl ='INFO'">
+																		<Strong>
+																			<e:Output Ref="Libelle2"/>
+																		</Strong>
+																		<d:If.Else>
+																			<e:Output Ref="Libelle2"/>
+																			<d:If ConditionExpr="Oblig='O'">
+																				<Span Class="oblig">*</Span>
+																			</d:If>
+																		</d:If.Else>
+																	</d:If>
+																</e:Td>
+															</e:Tr>
+														</d:If>
+														<e:Tr>
+															<e:Td Class="ei-saisie__th">
+																<d:If ConditionExpr="AffichCol != 'N'">
+																	<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																		<e:Output Ref="LibRecap"/>
+																		<d:If.Else>
+																			<e:Output Ref="Libelle"/>
+																		</d:If.Else>
+																	</d:If>
+																	<d:If ConditionExpr="Oblig='O'">
+																		<Span Class="oblig">*</Span>
+																	</d:If>
+																	<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																		<e:Hint Type="Information">
+																			<e:Output Ref="Libelle2"/>
+																		</e:Hint>
+																	</d:If>
+																</d:If>
+															</e:Td>
+															<e:Td>
+																<my:GenericTypeChamps/>
+															</e:Td>
+
+														</e:Tr>
+													</d:If>
+												</d:If>
+											</d:If.Else>
+										</d:If>
+									</d:If>
+									<d:If ConditionExpr="/Data/TypeAffichage != 'Collaborateur'">
+										<d:If ConditionExpr="dbtboolean(../../IsPersonnalise)">
+											<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+												<e:Tr>
+													<e:Td Class="ei-saisie__th" Colspan="2">
+														<d:If ConditionExpr="Type_Cpl ='INFO'">
+															<Strong>
+																<e:Output Ref="Libelle2"/>
+															</Strong>
+															<d:If.Else>
+																<e:Output Ref="Libelle2"/>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+															</d:If.Else>
+														</d:If>
+													</e:Td>
+												</e:Tr>
+											</d:If>
+											<e:Tr>
+												<e:Td Class="ei-saisie__th">
+													<d:If ConditionExpr="AffichCol != 'N'">
+														<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+															<e:Output Ref="LibRecap"/>
+															<d:If.Else>
+																<e:Output Ref="Libelle"/>
+															</d:If.Else>
+														</d:If>
+														<d:If ConditionExpr="Oblig='O'">
+															<Span Class="oblig">*</Span>
+														</d:If>
+														<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+															<e:Hint Type="Information">
+																<e:Output Ref="Libelle2"/>
+															</e:Hint>
+														</d:If>
+													</d:If>
+												</e:Td>
+												<e:Td>
+													<my:GenericPersonnalise />
+												</e:Td>
+											</e:Tr>
+											<d:If.Else>
+												<d:If ConditionExpr="IsVisible ='O'">
+													<d:If ConditionExpr="(Libelle2 != '' and Type_Cpl ='INFO') or (Libelle2 != '' and AffichCol ='N')">
+														<e:Tr>
+															<e:Td Class="ei-saisie__th" Colspan="2">
+																<d:If ConditionExpr="Type_Cpl ='INFO'">
+																	<Strong>
+																		<e:Output Ref="Libelle2"/>
+																	</Strong>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle2"/>
+																		<d:If ConditionExpr="Oblig='O'">
+																			<Span Class="oblig">*</Span>
+																		</d:If>
+																	</d:If.Else>
+																</d:If>
+															</e:Td>
+														</e:Tr>
+													</d:If>
+													<e:Tr>
+														<e:Td Class="ei-saisie__th">
+															<d:If ConditionExpr="AffichCol != 'N'">
+																<d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+																	<e:Output Ref="LibRecap"/>
+																	<d:If.Else>
+																		<e:Output Ref="Libelle"/>
+																	</d:If.Else>
+																</d:If>
+																<d:If ConditionExpr="Oblig='O'">
+																	<Span Class="oblig">*</Span>
+																</d:If>
+																<d:If ConditionExpr="Libelle2 != '' and Type_Cpl !='INFO'">
+																	<e:Hint Type="Information">
+																		<e:Output Ref="Libelle2"/>
+																	</e:Hint>
+																</d:If>
+															</d:If>
+														</e:Td>
+														<e:Td>
+															<my:GenericTypeChamps/>
+														</e:Td>
+													</e:Tr>
+												</d:If>
+											</d:If.Else>
+										</d:If>
+									</d:If>
+								</d:Case>
+							</d:Switch>
+						</d:If.Else>
+					</d:If>
+				</d:Foreach>
+			</e:Table>
+		</d:If.Else>
+	</d:If>
