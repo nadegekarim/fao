@@ -1,0 +1,213 @@
+<e:Table Aria.Role="presentation" Type="Input" Width="100%">
+    <e:Colgroup Aria.Role="presentation">
+        <e:Col Css.Width="30%" />
+        <e:Col Css.Width="70%" />
+    </e:Colgroup>
+
+    <d:Foreach Nodeset="ChampsList/ChampsVM">
+
+        <!-- Pré-calcul des variables -->
+        <d:Set Var="isPersonnalise" ValueExpr="dbtboolean(../../IsPersonnalise)" />
+        <d:Set Var="isApercu" ValueExpr="dbtboolean(../../IsApercu)" />
+        <d:Set Var="isCollaborateur" ValueExpr="/Data/TypeAffichage='Collaborateur'" />
+
+        <d:Set Var="showInfo"
+               ValueExpr="Libelle2 != '' and (Type_Cpl='INFO' or AffichCol='N')" />
+
+        <d:Set Var="showSousChamps"
+               ValueExpr="(Type_Cpl='O' and valeur='Oui') 
+               or (Type_Cpl='N' and valeur='Non')
+               or (Type_Cpl='TYPENT' and valeur='Oui')" />
+
+        <d:Set Var="showSouhait"
+               ValueExpr="Type_Cpl='SOUHAIT' and valeur='Oui'" />
+
+        <!-- Champ désactivé -->
+        <d:If ConditionExpr="Option!='N'">
+            <d:Continue/>
+        </d:If>
+
+        <!-- Affichage bloc information -->
+        <d:If ConditionExpr="$showInfo">
+            <e:Tr>
+                <e:Td Class="ei-saisie__th" Colspan="2">
+
+                    <d:If ConditionExpr="Type_Cpl='INFO'">
+                        <Strong>
+                            <e:Output Ref="Libelle2"/>
+                        </Strong>
+
+                    <d:If.Else>
+                        <e:Output Ref="Libelle2"/>
+                        <d:If ConditionExpr="Oblig='O'">
+                            <Span Class="oblig">*</Span>
+                        </d:If>
+                    </d:If.Else>
+
+                    </d:If>
+
+                </e:Td>
+            </e:Tr>
+        </d:If>
+
+        <!-- Champ principal -->
+        <e:Tr>
+
+            <e:Td Class="ei-saisie__th">
+
+                <d:If ConditionExpr="AffichCol!='N'">
+
+                    <d:If ConditionExpr="Type_Cpl='LIBRECAP'">
+                        <e:Output Ref="LibRecap"/>
+
+                    <d:If.Else>
+                        <e:Output Ref="Libelle"/>
+                    </d:If.Else>
+
+                    </d:If>
+
+                    <d:If ConditionExpr="Oblig='O'">
+                        <Span Class="oblig">*</Span>
+                    </d:If>
+
+                    <d:If ConditionExpr="Libelle2!='' and Type_Cpl!='INFO'">
+                        <e:Hint Type="Information">
+                            <e:Output Ref="Libelle2"/>
+                        </e:Hint>
+                    </d:If>
+
+                </d:If>
+
+            </e:Td>
+
+            <e:Td>
+
+                <!-- Choix du composant -->
+                <d:Switch TestValueExpr="Auteur">
+
+                    <d:Case Value="B">
+                        <my:GenericTypeChamps/>
+                    </d:Case>
+
+                    <d:Case Value="C">
+
+                        <d:If ConditionExpr="$isCollaborateur">
+                            <my:GenericTypeChamps/>
+                        </d:If>
+
+                    </d:Case>
+
+                    <d:Case Value="M">
+
+                        <d:If ConditionExpr="$isPersonnalise or $isApercu">
+                            <my:GenericTypeChamps/>
+
+                        <d:If.Else>
+                            <my:GenericTypeChampsOutput/>
+                        </d:If.Else>
+
+                        </d:If>
+
+                    </d:Case>
+
+                </d:Switch>
+
+            </e:Td>
+
+        </e:Tr>
+
+        <!-- Sous champs SOUHAIT -->
+        <d:If ConditionExpr="$showSouhait">
+
+            <d:Foreach Nodeset="SousChamps/ChampsVM">
+
+                <e:Tr>
+
+                    <e:Td></e:Td>
+
+                    <e:Td>
+
+                        <e:Table Aria.Role="presentation" Width="100%">
+
+                            <e:Colgroup>
+                                <e:Col Css.Width="10%" />
+                                <e:Col/>
+                            </e:Colgroup>
+
+                            <e:Tr>
+
+                                <e:Td>
+
+                                    <d:If ConditionExpr="Oblig='O'">
+                                        <Span Class="oblig">*</Span>
+                                    </d:If>
+
+                                    <e:Label>
+                                        <e:Output Ref="Libelle"/>
+                                    </e:Label>
+
+                                </e:Td>
+
+                                <e:Td>
+                                    <my:GenericTypeChamps/>
+                                </e:Td>
+
+                            </e:Tr>
+
+                        </e:Table>
+
+                    </e:Td>
+
+                </e:Tr>
+
+            </d:Foreach>
+
+        </d:If>
+
+        <!-- Sous champs conditionnels -->
+        <d:If ConditionExpr="$showSousChamps">
+
+            <d:Foreach Nodeset="SousChamps/ChampsVM">
+
+                <d:If ConditionExpr="Libelle2!=''">
+                    <e:Tr>
+                        <e:Td Class="ei-saisie__th" Colspan="2">
+                            <e:Output Ref="Libelle2"/>
+                        </e:Td>
+                    </e:Tr>
+                </d:If>
+
+                <e:Tr>
+
+                    <e:Td Class="ei-saisie__th">
+
+                        <e:Output Ref="Libelle"/>
+
+                        <d:If ConditionExpr="Oblig='O'">
+                            <Span Class="oblig">*</Span>
+                        </d:If>
+
+                    </e:Td>
+
+                    <e:Td>
+
+                        <d:If ConditionExpr="$isPersonnalise or $isApercu">
+                            <my:GenericTypeChamps/>
+
+                        <d:If.Else>
+                            <my:GenericTypeChampsOutput/>
+                        </d:If.Else>
+
+                        </d:If>
+
+                    </e:Td>
+
+                </e:Tr>
+
+            </d:Foreach>
+
+        </d:If>
+
+    </d:Foreach>
+
+</e:Table>
