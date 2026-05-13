@@ -1,0 +1,279 @@
+      *-============================================================
+      *-Descent : 29/04/26 at 09:00:00         MemoId  : ETRILLCH
+      *-Reason  : Visibilité d'un entretien
+      *-Package :
+      *-More    : Copie CPM OUT service RHU-ETRLISRH
+      *-============================================================
+      *----------------------------------------------------------------*
+      * MAE3O91               partie RETOUR VARIABLE des MESSAGES   C14*
+      * -------               échangés avec tout SERVICE APPLICATIF C14*
+      *                                        Version  : 000          *
+      *                                        Longueur : 15000 octets *
+      *----------------------------------------------------------------*
+       01  :MAE3O91:.
+      *----------------------------------------------------------------*
+      * En-tête généralisé pour tout COPY de type MESSAGE           C14*
+      * Comportant TAGs (ou BALISEs) standards/normalisés apposées via *
+      * commentaires standards à respecter                             *
+      * TAGs standards/normalisés C14 d'en-tête de COPY MESSAGE        *
+      *  - [MsgIdt] : identifiant du message (=nom COPY associé)       *
+      *  - [MsgVrs] : version en cours de la description de cette      *
+      *                  partie du message                             *
+      *  - [MsgLen] : Longueur effective de cette description          *
+      *----------------------------------------------------------------*
+           05  .
+      *[Dsc] Identifiant de cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgIdt]
+             10                          PIC X(008) VALUE 'MAE3O91'.
+      *[Dsc] Version courante de cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgVrs]
+             10                          PIC X(003) VALUE '000'.
+      *[Dsc] Longueur effective de cette description
+      *[Cst]
+      *[Typ] Integer
+      *[MsgLen]
+             10                          PIC 9(005) VALUE 30000.
+
+      *----------------------------------------------------------------*
+      * Business Data
+      *----------------------------------------------------------------*
+      *[Dsc] Donnée retour pour le service RHU-EtrLisRh
+           05  :MAE3O91:-Data.
+
+      *[Dsc] Nombre d'entretien lu
+      *[Typ] Integer
+             10 :MAE3O91:-NBR-ETR                   PIC 9(03).
+
+      *[Dsc] Tableau d'entretien
+      *[Typ] Array
+             10 :MAE3O91:-TAB       OCCURS 49
+                                        INDEXED BY  :MAE3O91:-TAB-IDX.
+
+      *[Dsc] timestamps de création
+      *[Typ] STRING
+                 15 :MAE3O91:-TSP-CRE               PIC X(26).
+
+      *[Dsc] User de création
+      *[Typ] STRING
+                 15 :MAE3O91:-USR-CRE               PIC X(10).
+
+      *[Dsc] Timestamp de derniére modification
+      *[Typ] STRING
+                 15 :MAE3O91:-TSP-MOF               PIC X(26).
+
+      *[Dsc] User de modification
+      *[Typ] STRING
+                 15 :MAE3O91:-USR-MOF               PIC X(10).
+
+      *[Dsc] Identifiant de l'entretien
+      *[Typ] INTEGER
+                 15 :MAE3O91:-IDT                   PIC 9(9).
+
+      *[Dsc]Libellé de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-LIB                   PIC X(100).
+
+      *[Dsc]Identifiant de la campagne
+      *[Typ] INTEGER
+                 15 :MAE3O91:-IDT-CMG               PIC 9(9).
+
+      *[Dsc]Identifiant du formulaire
+      *[Typ] INTEGER
+                 15 :MAE3O91:-IDT-FRL               PIC 9(5).
+
+      *[Dsc]Identifiant du collaborateur salarié
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-CLB               PIC X(10).
+      
+      *[Dsc]Identifiant du manager
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-MGR               PIC X(10).
+
+      *[Dsc]Identifiant du valideur 1
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-VLD-1             PIC X(10).
+
+      *[Dsc]Identifiant du valideur 2
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-VLD-2             PIC X(10).
+
+      *[Dsc]Identifiant du valideur 3
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-VLD-3             PIC X(10).
+
+      *[Dsc]Origine de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-ORI                   PIC X(5).
+
+      *[Dsc]Statut de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-STT                   PIC X(5).
+
+      *[Dsc]Identifiant du délagué
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-DLG               PIC X(10).
+
+      *[Dsc]Identifiant du délagataire
+      *[Typ] STRING
+                 15 :MAE3O91:-IFP-DLG-CRE           PIC X(10).
+
+      *[Dsc]Date de la délégation
+      *[Typ] STRING
+                 15 :MAE3O91:-DAT-DLG-CRE           PIC X(08).
+
+      *[Dsc]Motif terminer
+      *[Typ] STRING
+                 15 :MAE3O91:-MTF-TER               PIC X(5).
+
+      *[Dsc]Date limite de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-DAT-LIM               PIC X(08).
+
+      *[Dsc]Date de réalisation de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-DAT-REA               PIC X(08).
+
+      *[Dsc]Date de planification de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-DAT-PFN               PIC X(08).
+
+      *[Dsc]Nombre de donnée du collaborateur
+      *[Typ] INTEGER
+                 15 :MAE3O91:-NBR-DON-CLB           PIC 9(9).
+
+      *[Dsc]Nombre de donnée du manager
+      *[Typ] INTEGER
+                 15 :MAE3O91:-NBR-DON-MGR           PIC 9(9).
+
+      *[Dsc]Top exclu
+      *[Typ] STRING
+                 15 :MAE3O91:-EXL                   PIC X(1).
+
+      *[Dsc]Top de préaration de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-PPR                   PIC X(1).
+
+      *[Dsc]Bilan à 6 ans
+      *[Typ] STRING
+                 15 :MAE3O91:-BIA                   PIC X(1).
+
+      *[Dsc]Etat préparation du collaborateur
+      *[Typ] STRING
+                 15 :MAE3O91:-PPR-CLB               PIC X(1).
+
+      *[Dsc]Etat préparation du manager
+      *[Typ] STRING
+                 15 :MAE3O91:-PPR-MGR               PIC X(1).
+
+      *[Dsc]Visibilibé du collaborateur
+      *[Typ] STRING
+                 15 :MAE3O91:-VSB-CLB               PIC X(1).
+
+      *[Dsc]Visibilibé du manager
+      *[Typ] STRING
+                 15 :MAE3O91:-VSB-MGR               PIC X(1).
+
+      *[Dsc]Visibilibé RH
+      *[Typ] STRING
+                 15 :MAE3O91:-VSB-RH                PIC X(1).
+
+      *[Dsc]Théme de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-THM                   PIC X(5).
+
+      *[Dsc]Sous-théme de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-STH                   PIC X(5).
+
+      *[Dsc]Sous-théme de l'entretien
+      *[Typ] STRING
+                 15 :MAE3O91:-DAT-REF               PIC X(8).
+
+      *[Dsc]Code plannification
+      *[Typ] STRING
+                 15 :MAE3O91:-COD-PFN               PIC X(15).
+
+      *[Dsc]Nombre de suivit de statut max 2
+      *[Typ] INTEGER
+                 15 :MAE3O91:-NBR-SSE               PIC 9(1).
+
+      *[Dsc]Tableau de suivi de statut
+      *[Typ] ARRAY
+                 15 :MAE3O91:-TAB-SSE               OCCURS 2
+                                INDEXED BY  :MAE3O91:-TAB-SSE-IDX.
+      *[Dsc]SSE -- Code action
+      *[Typ] STRING
+                    20 :MAE3O91:-SSE-ACN-COD        PIC X(05).
+
+      *[Dsc]SSE -- Date de création
+      *[Typ] STRING
+                    20 :MAE3O91:-SSE-DAT-CRE        PIC X(08).
+
+      *[Dsc]SSE -- User de création
+      *[Typ] STRING
+                    20 :MAE3O91:-SSE-USR-CRE        PIC X(10).
+
+      *[Dsc]Nombre de notification max 2
+      *[Typ] INTEGER
+                 15 :MAE3O91:-NBR-SNE               PIC 9(1).
+
+      *[Dsc]Tableau de notification
+      *[Typ] ARRAY
+                 15 :MAE3O91:-TAB-SNE               OCCURS 2
+                                INDEXED BY  :MAE3O91:-TAB-SNE-IDX.
+      *[Dsc]SNE -- Type de notification
+      *[Typ] STRING
+                    20 :MAE3O91:-SNE-TYP            PIC X(05).
+
+      *[Dsc]SNE -- Date de création
+      *[Typ] STRING
+                    20 :MAE3O91:-SNE-DAT-CRE        PIC X(08).
+
+      *[Dsc]SNE -- User de création
+      *[Typ] STRING
+                    20 :MAE3O91:-SNE-USR-CRE        PIC X(10).
+
+      *-- Compteur Nombre de pièces jointes
+      *[Typ] INTEGER
+                 15 :MAE3O91:-NBR-PJ                PIC 9(3).
+                 
+      *[Dsc]Nom du collaborateur salarié
+      *[Typ] STRING
+                 15 :MAE3O91:-NOM-CLB               PIC X(50).
+
+      *[Dsc]Prénom du collaborateur salarié
+      *[Typ] STRING
+                 15 :MAE3O91:-PRE-CLB               PIC X(30).
+                 
+      *[Dsc]Nom du manager
+      *[Typ] STRING
+                 15 :MAE3O91:-NOM-MGR               PIC X(50).
+
+      *[Dsc]Prénom du manager
+      *[Typ] STRING
+                 15 :MAE3O91:-PRE-MGR               PIC X(30).           
+
+      *-- Lecture suite
+             10 :MAE3O91:-LEC-SUI.
+                 15 :MAE3O91:-TOP-LEC-SUI           PIC X(01).
+
+      *[Dsc] Identifiant entretien pour suite
+      *[Typ] Integer
+                 15 :MAE3O91:-IDT-SUI               PIC 9(9).
+
+           05  FILLER                               PIC X(2478).
+
+      *----------------------------------------------------------------*
+      * Eye-Catcher - balise de fin de la description, permettant de   *
+      *               vérifier à minima la cohérence du contenu porté. *
+      *               Si balise de fin présente et non altérée...      *
+      *----------------------------------------------------------------*
+      *[Dsc] Eye-Catcher lié à cette description
+      *[Cst]
+      *[Typ] String
+      *[MsgIdtEnd]
+           05                            PIC X(008) VALUE '/MAE3O91'.
