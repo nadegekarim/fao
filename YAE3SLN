@@ -1,0 +1,105 @@
+     *-============================================================
+      *-Descent : 16/03/2026 at 09:24:00          MemoId  : BATTEUDA
+      *-Reason  :
+      *-More    : DAB-16/03/2026
+      ******************************************************************
+      * SKEL = GENAPDB2(SQECPARG V2.00)                                *
+      *                                                                *
+      * YAE3SLN      : Copy variable sortie du logique AE3LLLIS        *
+      *                                                                *
+      * LONGUEUR     : 30000                                           *
+      ******************************************************************
+
+      *01  Y:AE3SLN:.
+
+      *[Dsc]  Données
+           05 :AE3SLN:-DON                        PIC X(30000).
+*-----------------------------------------------------------------
+      *    Données fonction L1052
+      *-----------------------------------------------------------------
+           05 :AE3SLN:-L1052 REDEFINES :AE3SLN:-DON.
+
+      *-- Nombre d'entretiens lus
+              10 :AE3SLN:-L1052-NBR-ETR           PIC 9(03).
+      *-- Tableau d'entretien
+              10 :AE3SLN:-L1052-TAB               OCCURS 40 INDEXED BY
+                                                 :AE3SLN:-L1052-IDX.
+      *-- timestamps de création
+                15 :AE3SLN:-L1052-TSP-CRE              PIC X(26).
+      *-- User de création
+                15 :AE3SLN:-L1052-USR-CRE              PIC X(10).
+      *-- Timestamp de derniére modification
+                15 :AE3SLN:-L1052-TSP-MOF              PIC X(26).
+      *-- User de derniére modification
+                15 :AE3SLN:-L1052-USR-MOF              PIC X(10).
+      *-- Identifiant de l'entretien
+                15 :AE3SLN:-L1052-IDT                  PIC S9(9) COMP.
+      *-- Libellé de l'entretien
+                15 :AE3SLN:-L1052-LIB                  PIC X(100).
+      *-- Identifiant de la campagne
+                15 :AE3SLN:-L1052-IDT-CMG              PIC S9(9) COMP.
+      *-- Identifiant du formulaire
+                15 :AE3SLN:-L1052-IDT-FRL              PIC S9(5) COMP-3.
+      *-- Identifiant du collaborateur salarié
+                15 :AE3SLN:-L1052-IFP-CLB              PIC X(10).
+      *-- Identifiant du manager
+                15 :AE3SLN:-L1052-IFP-MGR              PIC X(10).
+      *-- Identifiant du valideur 1
+                15 :AE3SLN:-L1052-IFP-VLD-1            PIC X(10).
+      *-- Identifiant du valideur 2
+                15 :AE3SLN:-L1052-IFP-VLD-2            PIC X(10).
+      *-- Identifiant du valideur 3
+                15 :AE3SLN:-L1052-IFP-VLD-3            PIC X(10).
+      *-- Origine de l'entretien
+                15 :AE3SLN:-L1052-ORI                  PIC X(5).
+      *-- Statut de l'entretien
+                15 :AE3SLN:-L1052-STT                  PIC X(5).
+      *-- Identifiant du délagataire
+                15 :AE3SLN:-L1052-IFP-DLG              PIC X(10).
+      *-- Motif terminer
+                15 :AE3SLN:-L1052-MTF-TER              PIC X(5).
+      *-- Date limite de l'entretien
+                15 :AE3SLN:-L1052-DAT-LIM              PIC X(08).
+      *-- Date de réalisation de l'entretien
+                15 :AE3SLN:-L1052-DAT-REA              PIC X(08).
+      *-- Date de planification de l'entretien
+                15 :AE3SLN:-L1052-DAT-PFN              PIC X(08).
+      *-- Nombre de donnée du collaborateur
+                15 :AE3SLN:-L1052-NBR-DON-CLB          PIC S9(9) COMP.
+      *-- Nombre de donnée du manager
+                15 :AE3SLN:-L1052-NBR-DON-MGR          PIC S9(9) COMP.
+      *-- Top exclu
+                15 :AE3SLN:-L1052-EXL                  PIC X(1).
+      *-- Top de préaration de l'entretien
+                15 :AE3SLN:-L1052-PPR                  PIC X(1).
+      *-- Bilan à 6 ans
+                15 :AE3SLN:-L1052-BIA                  PIC X(1).
+      *-- Etat préparation du collaborateur
+                15 :AE3SLN:-L1052-PPR-CLB              PIC X(1).
+      *-- Etat préparation du manager
+                15 :AE3SLN:-L1052-PPR-MGR              PIC X(1).
+      *-- Visibilibé du collaborateur
+                15 :AE3SLN:-L1052-VSB-CLB              PIC X(1).
+      *-- Visibilibé du manager
+                15 :AE3SLN:-L1052-VSB-MGR              PIC X(1).
+      *-- Visibilibé RH
+                15 :AE3SLN:-L1052-VSB-RH               PIC X(1).
+      *-- Théme de l'entretien
+                15 :AE3SLN:-L1052-THM                  PIC X(5).
+      *-- Sous-théme de l'entretien
+                15 :AE3SLN:-L1052-STH                  PIC X(5).
+      *-- Sous-théme de l'entretien
+                15 :AE3SLN:-L1052-DAT-REF              PIC X(10).
+      *-- Code planification
+                15 :AE3SLN:-L1052-COD-PFN              PIC X(15).
+      *-- Lecture suite
+             10 :AE3SLN:-L1052-LEC-SUI.
+                15 :AE3SLN:-L1052-TOP-LEC-SUI          PIC X(1).
+                   88 :AE3SLN:-L1052-SUI-OUI       VALUE 'O'.
+                   88 :AE3SLN:-L1052-SUI-NON       VALUE 'N'.
+
+                15 :AE3SLN:-L1052-CLE-LEC-SUI.
+                   20 :AE3SLN:-L1052-CLE-IDT-ETR       PIC S9(9) COMP.
+      *[Dsc]  Réserve
+               10 FILLER                           PIC X(13997).
+
