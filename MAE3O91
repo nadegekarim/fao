@@ -50,7 +50,7 @@
 
       *[Dsc] Tableau d'entretien
       *[Typ] Array
-             10 :MAE3O91:-TAB       OCCURS 49
+             10 :MAE3O91:-TAB       OCCURS 40
                                         INDEXED BY  :MAE3O91:-TAB-IDX.
 
       *[Dsc] timestamps de création
@@ -265,7 +265,7 @@
       *[Typ] Integer
                  15 :MAE3O91:-IDT-SUI               PIC 9(9).
 
-           05  FILLER                               PIC X(2478).
+           05  FILLER                               PIC X(4883).
 
       *----------------------------------------------------------------*
       * Eye-Catcher - balise de fin de la description, permettant de   *
